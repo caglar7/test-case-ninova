@@ -34,7 +34,7 @@ namespace Template.ObjectGridModule
         
         
         
-        public void Init()
+        public virtual void Init()
         {
             CalculateLocalPositions(rowCount, columnCount, out _localPositions);
 
