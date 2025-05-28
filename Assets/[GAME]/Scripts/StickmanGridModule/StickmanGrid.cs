@@ -11,7 +11,6 @@ namespace _GAME_.Scripts.StickmanGridModule
         public GameObject stickmanPrefab;
 
         private List<Stickman> _stickmans = new();
-        public Transform testMovePoint;
         
         
         public override void Init()
@@ -36,9 +35,6 @@ namespace _GAME_.Scripts.StickmanGridModule
                     FillSlot(stickman, row, column);
                     
                     _stickmans.Add(stickman);
-
-                    // testing
-                    stickman.testPoint = testMovePoint;
                 }
             }
         }

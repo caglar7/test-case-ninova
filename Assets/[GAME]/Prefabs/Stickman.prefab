@@ -186,7 +186,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input: {fileID: 5379131982435306599}
   mover: {fileID: 5856132677459300762}
-  testPoint: {fileID: 0}
   delay: 0.1
 --- !u!114 &5379131982435306599
 MonoBehaviour:

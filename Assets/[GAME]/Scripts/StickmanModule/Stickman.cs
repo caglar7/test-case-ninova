@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using _GAME_.Scripts.ComponentAccess;
+using _GAME_.Scripts.Movement;
 using Sirenix.OdinInspector;
 using Template;
 using Unity.VisualScripting;
@@ -13,7 +15,6 @@ namespace _GAME_.Scripts.StickmanModule
         public MouseDownInput input;
         public BaseMovement mover;
 
-        public Transform testPoint;
         public float delay = .1f;
         
         
@@ -21,9 +22,9 @@ namespace _GAME_.Scripts.StickmanModule
         public void Init()
         {
             input.Init();
-            input.MouseDown += HandleInput;
-            
             mover.Init();
+            
+            input.MouseDown += HandleInput;
             
             ObstacleMode();
         }
@@ -31,12 +32,39 @@ namespace _GAME_.Scripts.StickmanModule
         
         private void HandleInput()
         {
-            AgentMode(MoveToTestPoint);
+            // is there slot
+            if (ComponentFinder.instance.SlotHandler.AreSlotsFull())
+            {
+                print("Slots full");
+                return;
+            }
+            
+            AgentMode(TryMoveToSlot);
         }
-        
-        
-        
-        [Button]
+
+        private void TryMoveToSlot()
+        {
+            if (mover is BaseAgentMover agentMover)
+            {
+                if (agentMover.CanMoveToDestination(Points.instance.pointOutsideOfGrid.position))
+                {
+                    if(ComponentFinder.instance.SlotHandler.TryGetEmptySlot(out Slot slotFound))
+                    {
+                        slotFound.FillSlot(this);
+                        
+                        mover.Move(slotFound.Transform.position);
+                        
+                    }
+                }
+                else
+                {
+                    print("stickman cannot move");
+                    ObstacleMode();
+                }
+            }
+        }
+
+
         private void AgentMode(Action onSet = null)
         {
             NavMeshAgent.enabled = false;
@@ -65,12 +93,5 @@ namespace _GAME_.Scripts.StickmanModule
             onSet?.Invoke();
         }
 
-        
-
-
-        private void MoveToTestPoint()
-        {
-            mover.Move(testPoint);
-        }
     }
 }

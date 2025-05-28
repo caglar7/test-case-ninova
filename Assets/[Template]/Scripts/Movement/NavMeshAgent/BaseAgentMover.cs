@@ -18,7 +18,7 @@ public class BaseAgentMover : BaseMovement
 
         _agent = GetComponent<NavMeshAgent>();
 
-        _agent.stoppingDistance = stoppingDistance;
+        // _agent.stoppingDistance = stoppingDistance;
 
         // SetSpeed(SettingsMovement.Instance.speedDefault);
     }
@@ -37,7 +37,7 @@ public class BaseAgentMover : BaseMovement
         return _agent.remainingDistance <= stoppingDistance;
     }
 
-    protected bool CanMoveToDestination(Vector3 destination)
+    public bool CanMoveToDestination(Vector3 destination)
     {
         NavMeshPath path = new NavMeshPath();
         if (_agent.CalculatePath(destination, path))
