@@ -37,8 +37,12 @@ namespace _GAME_.Scripts.StickmanModule
             AddBrick();
             AddBrick();
         }
+        private void Update()
+        {
+            mover.OnUpdate();
+        }
 
-        
+
         private void HandleInput()
         {
             // is there slot
@@ -69,7 +73,20 @@ namespace _GAME_.Scripts.StickmanModule
                         slotFound.FillSlot(this);
                         
                         mover.Move(slotFound.Transform.position);
-                        
+
+                        mover.onDestinationReachedOnce += () =>
+                        {
+                            int itemCount = inventory.ItemList.Count;
+                            for (int i = 0; i < itemCount; i++)
+                            {
+                                BaseMono item = inventory.ItemList[^1];
+                                if (inventory.TryRemoveItem(item))
+                                {
+                                    ComponentFinder.instance.BrickRoadHandler.brickRoads[0]
+                                        .AddBrick((Brick) item);
+                                }
+                            }
+                        };
                     }
                 }
                 else
