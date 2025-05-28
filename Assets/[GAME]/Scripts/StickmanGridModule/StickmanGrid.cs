@@ -35,6 +35,8 @@ namespace _GAME_.Scripts.StickmanGridModule
                     FillSlot(stickman, row, column);
                     
                     _stickmans.Add(stickman);
+
+                    stickman.Transform.position = GetSlot(row, column).objectHolder.position;
                 }
             }
         }

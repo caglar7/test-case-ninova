@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using _GAME_.Scripts.BrickModule;
-using _GAME_.Scripts.BrickRoadModule;
+using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.ComponentAccess;
 using _GAME_.Scripts.Movement;
 using Sirenix.OdinInspector;
@@ -18,9 +19,13 @@ namespace _GAME_.Scripts.StickmanModule
         public AgentMoverPoint moverPoint;
         public AgentMoverPath moverPath;
         public BaseInventory inventory;
-
+        public ColorComponent colorComponent;
+        
         [Header("Resources")] 
         public GameObject brickPrefab;
+
+        [Header("Other")] 
+        public List<ColorType> colorsExcluded = new();
         
         
         public void Init()
@@ -34,10 +39,12 @@ namespace _GAME_.Scripts.StickmanModule
             
             ObstacleMode();
 
-            for (int i = 0; i < 8; i++)
+            ColorType stickmanColor = GeneralMethods.GetRandomEnumValueExcluding(colorsExcluded);
+            for (int i = 0; i < 6; i++)
             {
-                AddBrick();
+                AddBrick(stickmanColor);
             }
+            colorComponent.SetColor(stickmanColor);
         }
         private void Update()
         {
@@ -63,6 +70,12 @@ namespace _GAME_.Scripts.StickmanModule
             Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
             inventory.TryAddItem(brick);
         }
+        private void AddBrick(ColorType color)
+        {
+            Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
+            inventory.TryAddItem(brick);
+            brick.colorComponent.SetColor(color);
+        }
 
         
         private void TryMoveToSlot()
@@ -75,10 +88,7 @@ namespace _GAME_.Scripts.StickmanModule
                         
                     moverPoint.Move(slotFound.Transform.position);
 
-                    moverPoint.onDestinationReachedOnce = () =>
-                    {
-                        StartCoroutine(DropTilesOnRoad());
-                    };
+                    moverPoint.onDestinationReachedOnce = HandleReachedSlot;
                 }
             }
             else
@@ -88,10 +98,15 @@ namespace _GAME_.Scripts.StickmanModule
             }
         }
 
+        private void HandleReachedSlot()
+        {
+            StartCoroutine(DropTilesOnRoad());
+        }
+
         IEnumerator DropTilesOnRoad()
         {
-            if (ComponentFinder.instance.BrickRoadHandler
-                .TryGetAvailableRoad(ColorType.Blue, out BrickRoad brickRoad))
+            if (ComponentFinder.instance.BridgeHandler
+                .TryGetAvailableBridge(colorComponent.currentColor, out Bridge bridge))
             {
                 yield return new WaitForSeconds(0.35f);
             
@@ -101,14 +116,19 @@ namespace _GAME_.Scripts.StickmanModule
                     BaseMono item = inventory.ItemList[^1];
                     if (inventory.TryRemoveItem(item))
                     {
-                        brickRoad.AddBrick((Brick) item);
+                        bridge.AddBrick((Brick) item);
                     }
-
+                    
                     yield return new WaitForSeconds(0.07f);
+
+                    if (bridge.IsBridgeComplete)
+                    {
+                        break;
+                    }
                 }
             }
         }
-        private void CrossTheRoad(BrickRoad road)
+        public void CrossTheRoad(Bridge road)
         {
             moverPoint.Move(road.pathPoints[0]);
             moverPoint.onDestinationReachedOnce = () =>

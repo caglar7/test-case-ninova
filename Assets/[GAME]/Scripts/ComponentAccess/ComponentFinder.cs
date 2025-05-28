@@ -1,4 +1,4 @@
-using _GAME_.Scripts.BrickRoadModule;
+using _GAME_.Scripts.BridgeModule;
 using Template;
 
 namespace _GAME_.Scripts.ComponentAccess
@@ -6,7 +6,7 @@ namespace _GAME_.Scripts.ComponentAccess
     public class ComponentFinder : Singleton<ComponentFinder>
     {
         private SlotHandler _slotHandler;
-        private BrickRoadHandler _brickRoadHandler;
+        private BridgeHandler _bridgeHandler;
 
         public SlotHandler SlotHandler
         {
@@ -19,14 +19,14 @@ namespace _GAME_.Scripts.ComponentAccess
             }
         }
         
-        public BrickRoadHandler BrickRoadHandler
+        public BridgeHandler BridgeHandler
         {
             get
             {
-                if (_brickRoadHandler == null)
-                    _brickRoadHandler = FindObjectOfType<BrickRoadHandler>();
+                if (_bridgeHandler == null)
+                    _bridgeHandler = FindObjectOfType<BridgeHandler>();
 
-                return _brickRoadHandler;
+                return _bridgeHandler;
             }
         }
     }

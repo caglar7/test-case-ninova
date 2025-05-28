@@ -7,14 +7,13 @@ using Template;
 using TMPro;
 using UnityEngine;
 
-namespace _GAME_.Scripts.BrickRoadModule
+namespace _GAME_.Scripts.BridgeModule
 {
-    public class BrickRoad : BaseMono, IModuleInit
+    public class Bridge : BaseMono, IModuleInit
     {
         [Header("Settings")] 
         public float xDistance = .2f;
         public float zDistance = .4f;
-
         
         [Header("References")] 
         public TextMeshPro txtCount;
@@ -31,7 +30,7 @@ namespace _GAME_.Scripts.BrickRoadModule
         private List<Brick> _bricks = new();
 
 
-        public bool IsRoadCompleted => (_bricks.Count == _blueprints.Count) ? true : false;
+        public bool IsBridgeComplete => (_bricks.Count == _blueprints.Count) ? true : false;
 
 
         public void Init()
@@ -41,9 +40,15 @@ namespace _GAME_.Scripts.BrickRoadModule
             {
                 _blueprints.Add(blueprint);
             }
+            SetText();
         }
-        
-        
+
+        private void SetText()
+        {
+            txtCount.text = (_blueprints.Count - _bricks.Count).ToString();
+        }
+
+
         public void AddBrick(Brick brick)
         {
             if (_bricks.Count >= _blueprints.Count)
@@ -59,7 +64,7 @@ namespace _GAME_.Scripts.BrickRoadModule
             JumpToBlueprintIndex(
                 brick, 
                 _bricks.Count-1, 
-                (_bricks.Count == _blueprints.Count) ? HandleLastBrick : null
+                (_bricks.Count == _blueprints.Count) ? HandleLastBrick : SetText
             );
         }
 
@@ -84,14 +89,13 @@ namespace _GAME_.Scripts.BrickRoadModule
 
         private void HandleLastBrick()
         {
-            BrickRoadEvents.OnRoadCompleted?.Invoke(this);
-            
-            print("road is done");
+            SetText();
+            BridgeEvents.OnRoadCompleted?.Invoke(this);
         }
         
 
         [Button]
-        public void AddBlueprint()
+        public void AddBlueprint(ColorType colorType)
         {
             _blueprints.Add(Instantiate(blueprintPrefab).GetComponent<BrickBlueprint>());
             _blueprints.Add(Instantiate(blueprintPrefab).GetComponent<BrickBlueprint>());
@@ -104,6 +108,9 @@ namespace _GAME_.Scripts.BrickRoadModule
             
             _blueprints[^1].Transform.localPosition =
                 new Vector3(xDistance, 0f, (_blueprints.Count / 2 - 1) * xDistance);
+            
+            _blueprints[^2].colorComponent.SetColor(colorType);
+            _blueprints[^1].colorComponent.SetColor(colorType);
         }
         [Button]
         public void ClearBlueprints()
