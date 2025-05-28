@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using _GAME_.Scripts.BrickModule;
 using _GAME_.Scripts.ComponentAccess;
 using _GAME_.Scripts.Movement;
 using Sirenix.OdinInspector;
@@ -14,8 +15,12 @@ namespace _GAME_.Scripts.StickmanModule
         [Header("References")] 
         public MouseDownInput input;
         public BaseMovement mover;
+        public BaseInventory inventory;
 
-        public float delay = .1f;
+        [Header("Resources")] 
+        public GameObject brickPrefab;
+        
+        
         
         
         [Button]
@@ -23,10 +28,14 @@ namespace _GAME_.Scripts.StickmanModule
         {
             input.Init();
             mover.Init();
+            inventory.Init();
             
             input.MouseDown += HandleInput;
             
             ObstacleMode();
+            
+            AddBrick();
+            AddBrick();
         }
 
         
@@ -42,6 +51,13 @@ namespace _GAME_.Scripts.StickmanModule
             AgentMode(TryMoveToSlot);
         }
 
+        private void AddBrick()
+        {
+            Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
+            inventory.TryAddItem(brick);
+        }
+
+        
         private void TryMoveToSlot()
         {
             if (mover is BaseAgentMover agentMover)
@@ -73,7 +89,7 @@ namespace _GAME_.Scripts.StickmanModule
         }
         IEnumerator EnableAgentAfter(Action onSet)
         {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(.1f);
             NavMeshAgent.enabled = true;
             onSet?.Invoke();
         }
@@ -88,7 +104,7 @@ namespace _GAME_.Scripts.StickmanModule
         }
         IEnumerator EnableObstacleAfter(Action onSet)
         {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(.1f);
             NavMeshObstacle.enabled = true;
             onSet?.Invoke();
         }

@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2058913968
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2058913969}
+  m_Layer: 0
+  m_Name: Inventory Item Holder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2058913969
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2058913968}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.205, z: 0.168}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5379131982435306596}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5379131982369299176
 GameObject:
   m_ObjectHideFlags: 0
@@ -98,6 +129,7 @@ GameObject:
   - component: {fileID: 5379131982435306598}
   - component: {fileID: 5379131982435306599}
   - component: {fileID: 5856132677459300762}
+  - component: {fileID: 1559583860}
   m_Layer: 0
   m_Name: Stickman
   m_TagString: Untagged
@@ -118,6 +150,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5379131983205622600}
+  - {fileID: 2058913969}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -186,7 +219,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input: {fileID: 5379131982435306599}
   mover: {fileID: 5856132677459300762}
-  delay: 0.1
+  inventory: {fileID: 1559583860}
+  brickPrefab: {fileID: 7006688236901378705, guid: 0b8d4b0ff33ba9341ac629ca76dce485, type: 3}
 --- !u!114 &5379131982435306599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,6 +247,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoppingDistance: 0.5
+--- !u!114 &1559583860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5379131982435306597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d68765c63bab4f52a63f09b04df8c606, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemHolder: {fileID: 2058913969}
+  slotCount: 5
+  inventorySlots: []
+  offsetY: 0.05
 --- !u!1 &5379131983205622601
 GameObject:
   m_ObjectHideFlags: 0
