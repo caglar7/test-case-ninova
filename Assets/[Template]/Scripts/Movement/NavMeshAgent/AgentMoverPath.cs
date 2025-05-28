@@ -16,6 +16,10 @@ public class AgentMoverPath : BaseAgentMover
         HandleMoveAlongPath();
     }
 
+    public void Move(List<Transform> path)
+    {
+        Move(path.ToArray());
+    }
     public override void Move(Transform[] path)
     {
         Vector3[] positions = path.Select(t => t.position).ToArray();

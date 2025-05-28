@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: 5379131982435306598}
   - component: {fileID: 5379131982435306599}
   - component: {fileID: 5856132677459300762}
+  - component: {fileID: -3093817554581996729}
   - component: {fileID: 1559583860}
   m_Layer: 0
   m_Name: Stickman
@@ -218,7 +219,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 5379131982435306599}
-  mover: {fileID: 5856132677459300762}
+  moverPoint: {fileID: 5856132677459300762}
+  moverPath: {fileID: -3093817554581996729}
   inventory: {fileID: 1559583860}
   brickPrefab: {fileID: 7006688236901378705, guid: 0b8d4b0ff33ba9341ac629ca76dce485, type: 3}
 --- !u!114 &5379131982435306599
@@ -247,6 +249,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoppingDistance: 0.5
+--- !u!114 &-3093817554581996729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5379131982435306597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b82ac59001b77ea46936afa802789303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stoppingDistance: 0.5
 --- !u!114 &1559583860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,7 +275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemHolder: {fileID: 2058913969}
-  slotCount: 5
+  slotCount: 10
   inventorySlots: []
   offsetY: 0.05
 --- !u!1 &5379131983205622601

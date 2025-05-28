@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using _GAME_.Scripts.BrickModule;
+using _GAME_.Scripts.BrickRoadModule;
 using _GAME_.Scripts.ComponentAccess;
 using _GAME_.Scripts.Movement;
 using Sirenix.OdinInspector;
@@ -14,32 +15,34 @@ namespace _GAME_.Scripts.StickmanModule
     {
         [Header("References")] 
         public MouseDownInput input;
-        public BaseMovement mover;
+        public AgentMoverPoint moverPoint;
+        public AgentMoverPath moverPath;
         public BaseInventory inventory;
 
         [Header("Resources")] 
         public GameObject brickPrefab;
         
         
-        
-        
-        [Button]
         public void Init()
         {
             input.Init();
-            mover.Init();
+            moverPoint.Init();
+            moverPath.Init();
             inventory.Init();
             
             input.MouseDown += HandleInput;
             
             ObstacleMode();
-            
-            AddBrick();
-            AddBrick();
+
+            for (int i = 0; i < 8; i++)
+            {
+                AddBrick();
+            }
         }
         private void Update()
         {
-            mover.OnUpdate();
+            moverPoint.OnUpdate();
+            moverPath.OnUpdate();
         }
 
 
@@ -64,37 +67,58 @@ namespace _GAME_.Scripts.StickmanModule
         
         private void TryMoveToSlot()
         {
-            if (mover is BaseAgentMover agentMover)
+            if (moverPoint.CanMoveToDestination(Points.instance.pointOutsideOfGrid.position))
             {
-                if (agentMover.CanMoveToDestination(Points.instance.pointOutsideOfGrid.position))
+                if(ComponentFinder.instance.SlotHandler.TryGetEmptySlot(out Slot slotFound))
                 {
-                    if(ComponentFinder.instance.SlotHandler.TryGetEmptySlot(out Slot slotFound))
-                    {
-                        slotFound.FillSlot(this);
+                    slotFound.FillSlot(this);
                         
-                        mover.Move(slotFound.Transform.position);
+                    moverPoint.Move(slotFound.Transform.position);
 
-                        mover.onDestinationReachedOnce += () =>
-                        {
-                            int itemCount = inventory.ItemList.Count;
-                            for (int i = 0; i < itemCount; i++)
-                            {
-                                BaseMono item = inventory.ItemList[^1];
-                                if (inventory.TryRemoveItem(item))
-                                {
-                                    ComponentFinder.instance.BrickRoadHandler.brickRoads[0]
-                                        .AddBrick((Brick) item);
-                                }
-                            }
-                        };
-                    }
-                }
-                else
-                {
-                    print("stickman cannot move");
-                    ObstacleMode();
+                    moverPoint.onDestinationReachedOnce = () =>
+                    {
+                        StartCoroutine(DropTilesOnRoad());
+                    };
                 }
             }
+            else
+            {
+                print("stickman cannot move");
+                ObstacleMode();
+            }
+        }
+
+        IEnumerator DropTilesOnRoad()
+        {
+            if (ComponentFinder.instance.BrickRoadHandler
+                .TryGetAvailableRoad(ColorType.Blue, out BrickRoad brickRoad))
+            {
+                yield return new WaitForSeconds(0.35f);
+            
+                int itemCount = inventory.ItemList.Count;
+                for (int i = 0; i < itemCount; i++)
+                {
+                    BaseMono item = inventory.ItemList[^1];
+                    if (inventory.TryRemoveItem(item))
+                    {
+                        brickRoad.AddBrick((Brick) item);
+                    }
+
+                    yield return new WaitForSeconds(0.07f);
+                }
+            }
+        }
+        private void CrossTheRoad(BrickRoad road)
+        {
+            moverPoint.Move(road.pathPoints[0]);
+            moverPoint.onDestinationReachedOnce = () =>
+            {
+                moverPath.Move(road.pathPoints.GetRange(1, road.pathPoints.Count-1));
+                moverPath.onDestinationReachedOnce = () =>
+                {
+                    Destroy(gameObject, 0.5f);
+                };
+            };
         }
 
 

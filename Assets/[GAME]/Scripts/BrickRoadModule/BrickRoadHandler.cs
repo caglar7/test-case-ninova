@@ -16,5 +16,12 @@ namespace _GAME_.Scripts.BrickRoadModule
                 road.Init();
             }
         }
+
+
+        public bool TryGetAvailableRoad(ColorType color, out BrickRoad road)
+        {
+            road = brickRoads[0];
+            return true;
+        }
     }
 }

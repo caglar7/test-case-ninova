@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using _GAME_.Scripts.BrickModule;
 using _GAME.Scripts.ItemTransferModule;
@@ -19,6 +20,8 @@ namespace _GAME_.Scripts.BrickRoadModule
         public TextMeshPro txtCount;
         public Transform blueprintHolder;
         public Transform brickHolder;
+        public List<Transform> pathPoints = new();
+        
         
         [Header("Resources")] 
         public GameObject blueprintPrefab;
@@ -27,7 +30,10 @@ namespace _GAME_.Scripts.BrickRoadModule
         private List<BrickBlueprint> _blueprints = new();
         private List<Brick> _bricks = new();
 
-        
+
+        public bool IsRoadCompleted => (_bricks.Count == _blueprints.Count) ? true : false;
+
+
         public void Init()
         {
             _blueprints = new();
@@ -40,14 +46,24 @@ namespace _GAME_.Scripts.BrickRoadModule
         
         public void AddBrick(Brick brick)
         {
+            if (_bricks.Count >= _blueprints.Count)
+            {
+                Destroy(brick.gameObject);
+                return;
+            }
+            
             _bricks.Add(brick);
 
             brick.Transform.SetParent(brickHolder);
             
-            JumpToBlueprintIndex(brick, _bricks.Count-1);
+            JumpToBlueprintIndex(
+                brick, 
+                _bricks.Count-1, 
+                (_bricks.Count == _blueprints.Count) ? HandleLastBrick : null
+            );
         }
 
-        private void JumpToBlueprintIndex(Brick brick, int index)
+        private void JumpToBlueprintIndex(Brick brick, int index, Action onJumpDone = null)
         {
             ItemTransfer.TransferJump(
                 brick, 
@@ -56,6 +72,7 @@ namespace _GAME_.Scripts.BrickRoadModule
                 () =>
                 {
                     _blueprints[index].gameObject.SetActive(false);
+                    onJumpDone?.Invoke();
                 }
             );
             
@@ -65,6 +82,13 @@ namespace _GAME_.Scripts.BrickRoadModule
                 BrickSettings.Instance.brickRotateToRoad);
         }
 
+        private void HandleLastBrick()
+        {
+            BrickRoadEvents.OnRoadCompleted?.Invoke(this);
+            
+            print("road is done");
+        }
+        
 
         [Button]
         public void AddBlueprint()
