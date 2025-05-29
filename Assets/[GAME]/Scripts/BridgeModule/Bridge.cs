@@ -31,8 +31,11 @@ namespace _GAME_.Scripts.BridgeModule
 
 
         public bool IsBridgeComplete => (_bricks.Count == _blueprints.Count) ? true : false;
-
-
+        public int NextBlueprintIndex => _bricks.Count;
+        public List<BrickBlueprint> BrickBlueprints => _blueprints;
+        public int BrickCount => _bricks.Count;
+        
+        
         public void Init()
         {
             _blueprints = new();
@@ -42,13 +45,6 @@ namespace _GAME_.Scripts.BridgeModule
             }
             SetText();
         }
-
-        private void SetText()
-        {
-            txtCount.text = (_blueprints.Count - _bricks.Count).ToString();
-        }
-
-
         public void AddBrick(Brick brick)
         {
             if (_bricks.Count >= _blueprints.Count)
@@ -67,7 +63,25 @@ namespace _GAME_.Scripts.BridgeModule
                 (_bricks.Count == _blueprints.Count) ? HandleLastBrick : SetText
             );
         }
+        public int GetNextColorCount()
+        {
+            ColorType color = _blueprints[NextBlueprintIndex].colorComponent.currentColor;
+            int count = 0;
+            for (int i = NextBlueprintIndex; i < _blueprints.Count; i++)
+            {
+                if (_blueprints[i].colorComponent.currentColor == color)
+                    count++;
+                else
+                    break;
+            }
+            return count;
+        }
+        
 
+        private void SetText()
+        {
+            txtCount.text = (_blueprints.Count - _bricks.Count).ToString();
+        }
         private void JumpToBlueprintIndex(Brick brick, int index, Action onJumpDone = null)
         {
             ItemTransfer.TransferJump(
@@ -95,7 +109,7 @@ namespace _GAME_.Scripts.BridgeModule
         
 
         [Button]
-        public void AddBlueprint(ColorType colorType)
+        private void AddBlueprint(ColorType colorType)
         {
             _blueprints.Add(Instantiate(blueprintPrefab).GetComponent<BrickBlueprint>());
             _blueprints.Add(Instantiate(blueprintPrefab).GetComponent<BrickBlueprint>());
@@ -113,7 +127,7 @@ namespace _GAME_.Scripts.BridgeModule
             _blueprints[^1].colorComponent.SetColor(colorType);
         }
         [Button]
-        public void ClearBlueprints()
+        private void ClearBlueprints()
         {
             int count = _blueprints.Count;
 
@@ -123,6 +137,7 @@ namespace _GAME_.Scripts.BridgeModule
                 _blueprints.RemoveAt(0);
             }
         }
+
         
         
 #if UNITY_EDITOR

@@ -1,19 +1,20 @@
 using _GAME_.Scripts.BridgeModule;
+using _GAME_.Scripts.SlotModule;
 using Template;
 
 namespace _GAME_.Scripts.ComponentAccess
 {
     public class ComponentFinder : Singleton<ComponentFinder>
     {
-        private SlotHandler _slotHandler;
+        private StickmanSlotHandler _slotHandler;
         private BridgeHandler _bridgeHandler;
 
-        public SlotHandler SlotHandler
+        public StickmanSlotHandler SlotHandler
         {
             get
             {
                 if (_slotHandler == null)
-                    _slotHandler = FindObjectOfType<SlotHandler>();
+                    _slotHandler = FindObjectOfType<StickmanSlotHandler>();
 
                 return _slotHandler;
             }

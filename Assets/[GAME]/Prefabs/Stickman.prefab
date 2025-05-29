@@ -383,6 +383,7 @@ GameObject:
   - component: {fileID: -3093817554581996729}
   - component: {fileID: 1559583860}
   - component: {fileID: 3083282701196683402}
+  - component: {fileID: 596515409540605643}
   m_Layer: 0
   m_Name: Stickman
   m_TagString: Untagged
@@ -475,6 +476,7 @@ MonoBehaviour:
   moverPath: {fileID: -3093817554581996729}
   inventory: {fileID: 1559583860}
   colorComponent: {fileID: 3083282701196683402}
+  timer: {fileID: 596515409540605643}
   brickPrefab: {fileID: 7006688236901378705, guid: 0b8d4b0ff33ba9341ac629ca76dce485, type: 3}
   colorsExcluded: 030000000400000005000000
 --- !u!114 &5379131982435306599
@@ -552,6 +554,21 @@ MonoBehaviour:
     obj: {fileID: 5484786751223966578}
   - colorType: 2
     obj: {fileID: 417427655562193077}
+--- !u!114 &596515409540605643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5379131982435306597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88bee75545a963c40b0600715fc75690, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timerData:
+    period: 1
+    currentValue: 0
 --- !u!1 &5379131983205622601
 GameObject:
   m_ObjectHideFlags: 0

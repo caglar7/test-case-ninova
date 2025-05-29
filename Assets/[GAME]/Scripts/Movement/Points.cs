@@ -6,5 +6,6 @@ namespace _GAME_.Scripts.Movement
     public class Points : Singleton<Points>
     {
         public Transform pointOutsideOfGrid;
+        public Transform pointExit;
     }
 }

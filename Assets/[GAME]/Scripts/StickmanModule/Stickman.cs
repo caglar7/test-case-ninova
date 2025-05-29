@@ -7,8 +7,8 @@ using _GAME_.Scripts.ComponentAccess;
 using _GAME_.Scripts.Movement;
 using Sirenix.OdinInspector;
 using Template;
-using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace _GAME_.Scripts.StickmanModule
 {
@@ -20,6 +20,7 @@ namespace _GAME_.Scripts.StickmanModule
         public AgentMoverPath moverPath;
         public BaseInventory inventory;
         public ColorComponent colorComponent;
+        public Timer timer;
         
         [Header("Resources")] 
         public GameObject brickPrefab;
@@ -40,7 +41,7 @@ namespace _GAME_.Scripts.StickmanModule
             ObstacleMode();
 
             ColorType stickmanColor = GeneralMethods.GetRandomEnumValueExcluding(colorsExcluded);
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < Random.Range(6, 10); i++)
             {
                 AddBrick(stickmanColor);
             }
@@ -100,33 +101,83 @@ namespace _GAME_.Scripts.StickmanModule
 
         private void HandleReachedSlot()
         {
-            StartCoroutine(DropTilesOnRoad());
+            print(transform.name + "Dropping");
+            TryDropBricks(HandleReachedSlot, Leave);
         }
 
-        IEnumerator DropTilesOnRoad()
+
+        private void Leave()
+        {
+            List<Vector3> exitPoints = new();
+            exitPoints.Add(Transform.position + (Vector3.back * .7f));
+            exitPoints.Add(Points.instance.pointExit.position);
+            moverPath.Move(exitPoints);
+            moverPath.onDestinationReachedOnce = () =>
+            {
+                Destroy(gameObject, .2f);
+            };
+        }
+ 
+
+        private void TryDropBricks(Action onSomeRemaining, Action onDroppedAll)
         {
             if (ComponentFinder.instance.BridgeHandler
                 .TryGetAvailableBridge(colorComponent.currentColor, out Bridge bridge))
             {
-                yield return new WaitForSeconds(0.35f);
-            
-                int itemCount = inventory.ItemList.Count;
-                for (int i = 0; i < itemCount; i++)
-                {
-                    BaseMono item = inventory.ItemList[^1];
-                    if (inventory.TryRemoveItem(item))
-                    {
-                        bridge.AddBrick((Brick) item);
-                    }
-                    
-                    yield return new WaitForSeconds(0.07f);
-
-                    if (bridge.IsBridgeComplete)
-                    {
-                        break;
-                    }
-                }
+                StartCoroutine
+                (
+                    DropBricksOnBridge(
+                        bridge, 
+                        bridge.GetNextColorCount(),
+                        onSomeRemaining,
+                        onDroppedAll)            
+                );
             }
+            else
+            {
+                if (timer.OnTimerDone != null)
+                    return;
+                
+                timer.RemoveListeners();
+                timer.OnTimerDone += () =>
+                {
+                    TryDropBricks(HandleReachedSlot, StopTimerAndLeave);
+                };
+                timer.StartTimer();
+            }
+        }
+
+        private void StopTimerAndLeave()
+        {
+            timer.PauseTimer();
+            Leave();
+        }
+
+        IEnumerator DropBricksOnBridge(
+            Bridge bridge,
+            int dropCount,
+            Action onSomeRemaining,
+            Action onDroppedAll)
+        {
+            yield return new WaitForSeconds(0.35f);
+
+            int count = Mathf.Clamp(dropCount, 0, inventory.ItemList.Count);
+            
+            for (int i = 0; i < count; i++)
+            {
+                BaseMono item = inventory.ItemList[^1];
+                if (inventory.TryRemoveItem(item))
+                {
+                    bridge.AddBrick((Brick) item);
+                }
+                    
+                yield return new WaitForSeconds(0.07f);
+            }
+            
+            if(inventory.ItemList.Count == 0)
+                onDroppedAll?.Invoke();
+            else 
+                onSomeRemaining?.Invoke();
         }
         public void CrossTheRoad(Bridge road)
         {

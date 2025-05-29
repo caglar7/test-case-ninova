@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Template;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace _GAME_.Scripts.BridgeModule
@@ -7,33 +8,48 @@ namespace _GAME_.Scripts.BridgeModule
     public class BridgeHandler : BaseMono, IModuleInit
     {
         public List<Bridge> bridges = new();
+        
+        [SerializeField] private List<Bridge> availableBridges;
 
 
         public void Init()
         {
-            foreach (Bridge road in bridges)
+            foreach (Bridge bridge in bridges)
             {
-                road.Init();
+                bridge.Init();
             }
         }
 
 
-        public bool TryGetAvailableBridge(ColorType color, out Bridge road)
+        public bool TryGetAvailableBridge(ColorType color, out Bridge bridge)
         {
-            // foreach (Bridge brickRoad in bridges)
-            // {
-            //     if (brickRoad.currentColor == color)
-            //     {
-            //         if (brickRoad.IsRoadCompleted == false)
-            //         {
-            //             road = brickRoad;
-            //             return true;
-            //         }
-            //     }
-            // }
+            availableBridges = new();
+             
+            foreach (Bridge b in bridges)
+            {
+                if (b.IsBridgeComplete)
+                    continue;
+                
+                if (b.BrickBlueprints[b.NextBlueprintIndex].colorComponent.currentColor == color)
+                {
+                    availableBridges.Add(b);
+                }
+            }
+                      
+            availableBridges.Sort((bridgeA, bridgeB) =>
+                bridgeA.BrickCount > bridgeB.BrickCount ? 1 : -1
+            );
 
-            road = null;
-            return false;
+            if (availableBridges.Count > 0)
+            {
+                bridge = availableBridges[0];
+                return true;
+            }
+            else
+            {
+                bridge = null;
+                return false;
+            }
         }
 
         public bool AreAllBridgesComplete()
