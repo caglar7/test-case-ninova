@@ -1,9 +1,12 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.StickmanModule;
 using Sirenix.OdinInspector;
 using Template;
 using Unity.VisualScripting;
+using UnityEngine;
 
 namespace _GAME_.Scripts.StageModule
 {
@@ -15,8 +18,12 @@ namespace _GAME_.Scripts.StageModule
         
         public Stage CurrentStage => stages[currentStageIndex];
         public Stage NextStage => stages[currentStageIndex + 1];
-        
-        
+
+        public float duration = 1f;
+
+        private int _agentCount;
+        private int _stickmanCount;
+
         public void Init()
         {
             InitStages();
@@ -42,6 +49,41 @@ namespace _GAME_.Scripts.StageModule
                 }
             }
 
+            
+            
+            
+            _stickmanCount = 0;
+            _agentCount = 0;
+            for (int col = 0; col < 5; col++)
+            {
+                for (int row = 0; row < 5; row++)
+                {
+                    if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
+                        CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
+                    {
+                        _stickmanCount++;
+                    }
+                }
+            }   
+            for (int col = 0; col < 5; col++)
+            {
+                for (int row = 0; row < 5; row++)
+                {
+                    if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
+                        CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
+                    {
+                        stickman.AgentMode(() =>
+                        {
+                            CheckAgentCount(Step2);
+                        });
+                    }
+                }
+            }  
+        }
+        
+        
+        private void Step2()
+        {
             for (int col = 0; col < 5; col++)
             {
                 for (int row = 0; row < 5; row++)
@@ -52,7 +94,27 @@ namespace _GAME_.Scripts.StageModule
                         MoveToNextStageGrid(stickman, row, col);
                     }
                 }
-            }            
+            }    
+            
+            BaseComponentFinder.instance.CameraManager
+                .ChangeAngle(currentStageIndex+1, duration);
+            
+            StartCoroutine(SetStageIndexAfter(duration));
+        }
+
+        private void CheckAgentCount(Action onAllAgent)
+        {
+            _agentCount++;
+            if (_agentCount == _stickmanCount)
+            {
+                onAllAgent?.Invoke();
+            }
+        }
+
+        IEnumerator SetStageIndexAfter(float f)
+        {
+            yield return new WaitForSeconds(f);
+            currentStageIndex++;
         }
 
         private void MoveToNextStageGrid(Stickman stickman, int row, int col)
@@ -69,10 +131,17 @@ namespace _GAME_.Scripts.StageModule
                 stickman.CrossTheBridge(bridgeClosest, () =>
                 {
                     stickman.moverPoint.Move(NextStage.stickmanGrid.GetSlot(row, col).objectHolder.position);
+                    StartCoroutine(SetObstacleModeAfter(stickman, 1f));
                 });
             });
         }
 
+        IEnumerator SetObstacleModeAfter(Stickman stickman, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            stickman.ObstacleMode();
+        }
+        
         private void MoveToNextStageSlots(Stickman stickman, Bridge bridgeClosest, int slotIndex)
         {
             stickman.timer.PauseTimer();

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Template
 {
-    public static class ItemRotation
+    public static class TweenRotation
     {
         public static void RotateGlobal(
             BaseMono obj, 

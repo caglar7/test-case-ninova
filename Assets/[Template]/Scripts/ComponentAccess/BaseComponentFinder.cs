@@ -11,9 +11,19 @@ namespace Template
         private BaseLevelManager _levelManager;
         private InputComponentManager _inputComponentManager;
         private TimeScalingManager _timeScalingManager;
-        
-        
- 
+        private CameraManager _cameraManager;
+
+
+        public CameraManager CameraManager
+        {
+            get
+            {
+                if (_cameraManager == null)
+                    _cameraManager = FindObjectOfType<CameraManager>();
+
+                return _cameraManager;
+            }
+        }
         public TimeScalingManager TimeScalingManager
         {
             get

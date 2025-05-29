@@ -124,13 +124,27 @@ public abstract class BaseMono : MonoBehaviour
 
                 if(_animator == null)
                 {
-                    foreach(Transform child in transform)
-                        if(child.GetComponent<Animator>())
+                    foreach (Transform child in transform)
+                    {
+                        if(child.gameObject.activeSelf &&
+                           child.GetComponent<Animator>())
                         {
                             _animator = child.GetComponent<Animator>();
 
                             break;
                         }
+                        
+                        foreach (Transform child1 in child)
+                        {
+                            if(child1.gameObject.activeSelf &&
+                               child1.GetComponent<Animator>())
+                            {
+                                _animator = child1.GetComponent<Animator>();
+
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 

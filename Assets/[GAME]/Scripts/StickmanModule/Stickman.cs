@@ -7,6 +7,7 @@ using _GAME_.Scripts.ComponentAccess;
 using _GAME_.Scripts.Movement;
 using Sirenix.OdinInspector;
 using Template;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -21,13 +22,16 @@ namespace _GAME_.Scripts.StickmanModule
         public BaseInventory inventory;
         public ColorComponent colorComponent;
         public Timer timer;
+        public StickmanAnimation stickmanAnimation;
         
         [Header("Resources")] 
         public GameObject brickPrefab;
 
         [Header("Other")] 
         public List<ColorType> colorsExcluded = new();
-        
+
+        private Action<StickmanState> _onStateChanged;
+        public StickmanState currentState;
         
         public void Init()
         {
@@ -46,7 +50,12 @@ namespace _GAME_.Scripts.StickmanModule
                 AddBrick(stickmanColor);
             }
             colorComponent.SetColor(stickmanColor);
+
+            _onStateChanged = null;
+            _onStateChanged += stickmanAnimation.HandleAnimation;
+            SetStickmanState(StickmanState.CarryIdle); // start with this state
         }
+
         private void Update()
         {
             moverPoint.OnUpdate();
@@ -65,7 +74,8 @@ namespace _GAME_.Scripts.StickmanModule
             
             AgentMode(TryMoveToSlot);
         }
-
+        
+        
         private void AddBrick()
         {
             Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
@@ -86,14 +96,21 @@ namespace _GAME_.Scripts.StickmanModule
             {
                 if(ComponentFinder.instance.SlotHandler.TryGetEmptySlot(out Slot slotFound))
                 {
+                    SetStickmanState(StickmanState.CarryRunning);
+                    
                     slotFound.FillSlot(this);
 
                     ComponentFinder.instance.StageHandler.CurrentStage.stickmanGrid
                         .ClearSlotWith(this);
                     
-                    moverPoint.Move(slotFound.Transform.position);
+                    moverPoint.Move(slotFound.objectHolder.position);
 
-                    moverPoint.onDestinationReachedOnce = HandleReachedSlot;
+                    moverPoint.onDestinationReachedOnce = () =>
+                    {
+                        SetStickmanState(StickmanState.CarryIdle);
+
+                        RotateToFront(HandleReachedSlot);
+                    };
                 }
             }
             else
@@ -105,24 +122,9 @@ namespace _GAME_.Scripts.StickmanModule
 
         private void HandleReachedSlot()
         {
-            print(transform.name + "Dropping");
-            TryDropBricks(HandleReachedSlot, Leave);
+            TryDropBricks(HandleReachedSlot, RotateAndLeave);
         }
-
-
-        private void Leave()
-        {
-            ComponentFinder.instance.SlotHandler.ClearSlotWith(this);
-            
-            List<Vector3> exitPoints = new();
-            exitPoints.Add(Transform.position + (Vector3.back * .7f));
-            exitPoints.Add(ComponentFinder.instance.StageHandler.CurrentStage.points.pointExit.position);
-            moverPath.Move(exitPoints);
-            moverPath.onDestinationReachedOnce = () =>
-            {
-                Destroy(gameObject, .2f);
-            };
-        }
+        
  
 
         private void TryDropBricks(Action onSomeRemaining, Action onDroppedAll)
@@ -147,17 +149,38 @@ namespace _GAME_.Scripts.StickmanModule
                 timer.RemoveListeners();
                 timer.OnTimerDone += () =>
                 {
-                    TryDropBricks(HandleReachedSlot, StopTimerAndLeave);
+                    TryDropBricks(HandleReachedSlot, StopTimerAndRotateAndLeave);
                 };
                 timer.StartTimer();
             }
         }
 
-        private void StopTimerAndLeave()
+        private void StopTimerAndRotateAndLeave()
         {
             timer.PauseTimer();
-            Leave();
+            RotateAndLeave();
         }
+        
+        private void RotateAndLeave()
+        {
+            RotateToBack(Leave);
+        }
+        private void Leave()
+        {
+            SetStickmanState(StickmanState.Running);
+            
+            ComponentFinder.instance.SlotHandler.ClearSlotWith(this);
+            
+            List<Vector3> exitPoints = new();
+            exitPoints.Add(Transform.position + (Vector3.back * .7f));
+            exitPoints.Add(ComponentFinder.instance.StageHandler.CurrentStage.points.pointExit.position);
+            moverPath.Move(exitPoints);
+            moverPath.onDestinationReachedOnce = () =>
+            {
+                Destroy(gameObject, .2f);
+            };
+        }
+        
 
         IEnumerator DropBricksOnBridge(
             Bridge bridge,
@@ -223,5 +246,27 @@ namespace _GAME_.Scripts.StickmanModule
             onSet?.Invoke();
         }
 
+        private void SetStickmanState(StickmanState state)
+        {
+            currentState = state;
+            _onStateChanged?.Invoke(currentState);
+        }
+
+        private void RotateToFront(Action onDone)
+        {
+            TweenRotation.RotateGlobal(
+                this, 
+                Vector3.zero, 
+                StickmanSettings.Instance.rotationToFrontSettings,
+                onDone);
+        }
+        private void RotateToBack(Action onDone)
+        {
+            TweenRotation.RotateGlobal(
+                this, 
+                new Vector3(0f, 180f, 0f), 
+                StickmanSettings.Instance.rotationToBackSettings,
+                onDone);
+        }
     }
 }

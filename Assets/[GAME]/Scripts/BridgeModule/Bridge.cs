@@ -95,7 +95,7 @@ namespace _GAME_.Scripts.BridgeModule
                 }
             );
             
-            ItemRotation.RotateGlobal(
+            TweenRotation.RotateGlobal(
                 brick, 
                 Vector3.zero,
                 BrickSettings.Instance.brickRotateToRoad);
