@@ -1,0 +1,22 @@
+using _GAME_.Scripts.BridgeModule;
+using _GAME_.Scripts.Movement;
+using _GAME_.Scripts.SlotModule;
+using _GAME_.Scripts.StickmanGridModule;
+using Template;
+
+namespace _GAME_.Scripts.StageModule
+{
+    public class Stage : BaseMono, IModuleInit
+    {
+        public BridgeHandler bridgeHandler;
+        public StickmanSlotHandler stickmanSlotHandler;
+        public StickmanGrid stickmanGrid;
+        public Points points;
+        
+        public void Init()
+        {
+            bridgeHandler.Init();
+            stickmanGrid.Init();
+        }
+    }
+}

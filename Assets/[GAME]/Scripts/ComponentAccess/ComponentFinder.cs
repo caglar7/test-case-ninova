@@ -1,5 +1,6 @@
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.SlotModule;
+using _GAME_.Scripts.StageModule;
 using Template;
 
 namespace _GAME_.Scripts.ComponentAccess
@@ -8,27 +9,22 @@ namespace _GAME_.Scripts.ComponentAccess
     {
         private StickmanSlotHandler _slotHandler;
         private BridgeHandler _bridgeHandler;
+        private StageHandler _stageHandler;
 
-        public StickmanSlotHandler SlotHandler
+
+        public StageHandler StageHandler
         {
             get
             {
-                if (_slotHandler == null)
-                    _slotHandler = FindObjectOfType<StickmanSlotHandler>();
+                if (_stageHandler == null)
+                    _stageHandler = FindObjectOfType<StageHandler>();
 
-                return _slotHandler;
+                return _stageHandler;
             }
         }
         
-        public BridgeHandler BridgeHandler
-        {
-            get
-            {
-                if (_bridgeHandler == null)
-                    _bridgeHandler = FindObjectOfType<BridgeHandler>();
+        public StickmanSlotHandler SlotHandler => StageHandler.CurrentStage.stickmanSlotHandler;
 
-                return _bridgeHandler;
-            }
-        }
+        public BridgeHandler BridgeHandler => StageHandler.CurrentStage.bridgeHandler;
     }
 }

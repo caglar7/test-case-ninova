@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _GAME_.Scripts.Movement
 {
-    public class Points : Singleton<Points>
+    public class Points : BaseMono
     {
         public Transform pointOutsideOfGrid;
         public Transform pointExit;

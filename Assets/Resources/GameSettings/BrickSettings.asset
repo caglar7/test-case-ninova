@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BrickSettings
   m_EditorClassIdentifier: 
   brickJumpToRoad:
-    jumpPower: 2
+    jumpPower: 0.5
     numOfJumps: 1
     jumpDuration: 0.5
     jumpEase: 1

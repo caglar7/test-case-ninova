@@ -81,12 +81,16 @@ namespace _GAME_.Scripts.StickmanModule
         
         private void TryMoveToSlot()
         {
-            if (moverPoint.CanMoveToDestination(Points.instance.pointOutsideOfGrid.position))
+            Vector3 target = ComponentFinder.instance.StageHandler.CurrentStage.points.pointOutsideOfGrid.position;
+            if (moverPoint.CanMoveToDestination(target))
             {
                 if(ComponentFinder.instance.SlotHandler.TryGetEmptySlot(out Slot slotFound))
                 {
                     slotFound.FillSlot(this);
-                        
+
+                    ComponentFinder.instance.StageHandler.CurrentStage.stickmanGrid
+                        .ClearSlotWith(this);
+                    
                     moverPoint.Move(slotFound.Transform.position);
 
                     moverPoint.onDestinationReachedOnce = HandleReachedSlot;
@@ -108,9 +112,11 @@ namespace _GAME_.Scripts.StickmanModule
 
         private void Leave()
         {
+            ComponentFinder.instance.SlotHandler.ClearSlotWith(this);
+            
             List<Vector3> exitPoints = new();
             exitPoints.Add(Transform.position + (Vector3.back * .7f));
-            exitPoints.Add(Points.instance.pointExit.position);
+            exitPoints.Add(ComponentFinder.instance.StageHandler.CurrentStage.points.pointExit.position);
             moverPath.Move(exitPoints);
             moverPath.onDestinationReachedOnce = () =>
             {
@@ -179,21 +185,18 @@ namespace _GAME_.Scripts.StickmanModule
             else 
                 onSomeRemaining?.Invoke();
         }
-        public void CrossTheRoad(Bridge road)
+        public void CrossTheBridge(Bridge bridge, Action onCrossDone)
         {
-            moverPoint.Move(road.pathPoints[0]);
+            moverPoint.Move(bridge.pathPoints[0]);
             moverPoint.onDestinationReachedOnce = () =>
             {
-                moverPath.Move(road.pathPoints.GetRange(1, road.pathPoints.Count-1));
-                moverPath.onDestinationReachedOnce = () =>
-                {
-                    Destroy(gameObject, 0.5f);
-                };
+                moverPath.Move(bridge.pathPoints.GetRange(1, bridge.pathPoints.Count-1));
+                moverPath.onDestinationReachedOnce = onCrossDone;
             };
         }
 
 
-        private void AgentMode(Action onSet = null)
+        public void AgentMode(Action onSet = null)
         {
             NavMeshAgent.enabled = false;
             NavMeshObstacle.enabled = false;
@@ -207,8 +210,7 @@ namespace _GAME_.Scripts.StickmanModule
         }
         
 
-        [Button]
-        private void ObstacleMode(Action onSet = null)
+        public void ObstacleMode(Action onSet = null)
         {
             NavMeshAgent.enabled = false;
             NavMeshObstacle.enabled = false;

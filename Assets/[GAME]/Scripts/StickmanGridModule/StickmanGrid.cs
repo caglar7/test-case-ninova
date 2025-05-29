@@ -13,14 +13,7 @@ namespace _GAME_.Scripts.StickmanGridModule
         private List<Stickman> _stickmans = new();
         
         
-        public override void Init()
-        {
-            base.Init();
-
-            FillGridWithStickmans();
-        }
-
-        private void FillGridWithStickmans()
+        public void FillWithRandomStickmen()
         {
             for (int row = 0; row < rowCount; row++)
             {
@@ -37,6 +30,25 @@ namespace _GAME_.Scripts.StickmanGridModule
                     _stickmans.Add(stickman);
 
                     stickman.Transform.position = GetSlot(row, column).objectHolder.position;
+                }
+            }
+        }
+        
+        public override void FillSlot(BaseMono obj, int row, int column)
+        {
+            Slots[row, column].FillSlot(obj);
+            obj.Transform.SetParent(objectHolder);
+        }
+
+        public void ClearSlotWith(Stickman stickman)
+        {
+            foreach (GridSlot slot in Slots)
+            {
+                if (slot.IsFilled() &&
+                    slot.currentObject is Stickman check &&
+                    check == stickman)
+                {
+                    slot.ClearSlot();
                 }
             }
         }
