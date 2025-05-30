@@ -33,7 +33,8 @@ namespace _GAME_.Scripts.BridgeModule
         public int BrickCount => _bricks.Count;
 
         public Action OnBridgeCompleted;
-            
+
+        private int _visualBrickCount;
             
         public void Init()
         {
@@ -44,6 +45,7 @@ namespace _GAME_.Scripts.BridgeModule
             }
             SetText();
             OnBridgeCompleted = null;
+            _visualBrickCount = 0;
         }
         public void AddBrick(Brick brick, float jumpDelay, Action onDropDone)
         {
@@ -61,8 +63,14 @@ namespace _GAME_.Scripts.BridgeModule
             {
                 JumpToBlueprintIndex(
                     brick, 
-                    _bricks.IndexOf(brick), 
-                    onDropDone
+                    _bricks.IndexOf(brick),
+                    () =>
+                    {
+                        onDropDone?.Invoke();
+                        SetText();
+                        
+                        HandleLastBrick();
+                    }
                 );
             });
         }
@@ -79,11 +87,14 @@ namespace _GAME_.Scripts.BridgeModule
             }
             return count;
         }
-        
         private void HandleLastBrick()
         {
-            SetText();
-            OnBridgeCompleted?.Invoke();
+            _visualBrickCount++;
+            
+            if (_visualBrickCount >= _blueprints.Count)
+            {
+                OnBridgeCompleted?.Invoke();
+            }
         }
         private void SetText()
         {

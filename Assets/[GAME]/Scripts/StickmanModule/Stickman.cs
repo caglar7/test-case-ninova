@@ -94,7 +94,6 @@ namespace _GAME_.Scripts.StickmanModule
             // is there slot
             if (ComponentFinder.instance.SlotHandler.AreSlotsFull())
             {
-                print("Slots full");
                 return;
             }
             
@@ -230,11 +229,11 @@ namespace _GAME_.Scripts.StickmanModule
             _currentOnDroppedAll = onDroppedAll;
             
             int count = Mathf.Clamp(dropCount, 0, inventory.ItemList.Count);
-            
+
             for (int i = 0; i < count; i++)
             {
-                BaseMono item = inventory.ItemList[^1];
-                
+                var item = inventory.ItemList[^1];
+
                 if (inventory.TryRemoveItem(item))
                 {
                     bridge.AddBrick(

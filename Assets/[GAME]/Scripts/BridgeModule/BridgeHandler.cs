@@ -76,7 +76,7 @@ namespace _GAME_.Scripts.BridgeModule
         {
             completedBridges++;
 
-            if (completedBridges >= availableBridges.Count)
+            if (completedBridges >= bridges.Count)
             {
                 OnAllBridgesCompleted?.Invoke();
             }
