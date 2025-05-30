@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using _GAME_.Scripts.BrickModule;
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.ComponentAccess;
-using _GAME_.Scripts.Movement;
-using Sirenix.OdinInspector;
 using Template;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -40,28 +37,53 @@ namespace _GAME_.Scripts.StickmanModule
             moverPath.Init();
             inventory.Init();
             
-            input.MouseDown += HandleInput;
-            
-            ObstacleMode();
-
             ColorType stickmanColor = GeneralMethods.GetRandomEnumValueExcluding(colorsExcluded);
             for (int i = 0; i < Random.Range(6, 10); i++)
             {
                 AddBrick(stickmanColor);
             }
             colorComponent.SetColor(stickmanColor);
-
+            
+            input.MouseDown += HandleInput;
             _onStateChanged = null;
             _onStateChanged += stickmanAnimation.HandleAnimation;
-            SetStickmanState(StickmanState.CarryIdle); // start with this state
+            
+            SetStickmanState(StickmanState.CarryIdle); 
+            ObstacleMode();
         }
+        public void CrossTheBridge(Bridge bridge, Action onCrossDone)
+        {
+            moverPoint.Move(bridge.pathPoints[0]);
+            moverPoint.onDestinationReachedOnce = () =>
+            {
+                moverPath.Move(bridge.pathPoints.GetRange(1, bridge.pathPoints.Count-1));
+                moverPath.onDestinationReachedOnce = onCrossDone;
+            };
+        }
+        public void SetStickmanState(StickmanState state)
+        {
+            currentState = state;
+            _onStateChanged?.Invoke(currentState);
+        }
+        public void AgentMode(Action onSet = null)
+        {
+            NavMeshAgent.enabled = false;
+            NavMeshObstacle.enabled = false;
+            StartCoroutine(EnableAgentAfter(onSet));
+        }
+        public void ObstacleMode(Action onSet = null)
+        {
+            NavMeshAgent.enabled = false;
+            NavMeshObstacle.enabled = false;
+            StartCoroutine(EnableObstacleAfter(onSet));
+        }
+        
 
         private void Update()
         {
             moverPoint.OnUpdate();
             moverPath.OnUpdate();
         }
-
 
         private void HandleInput()
         {
@@ -74,7 +96,6 @@ namespace _GAME_.Scripts.StickmanModule
             
             AgentMode(TryMoveToSlot);
         }
-        
         
         private void AddBrick()
         {
@@ -111,6 +132,10 @@ namespace _GAME_.Scripts.StickmanModule
 
                         RotateToFront(HandleReachedSlot);
                     };
+
+                    input.isInputActive = false;
+                    
+                    StickmanEvents.OnMadeMove?.Invoke();
                 }
             }
             else
@@ -208,23 +233,9 @@ namespace _GAME_.Scripts.StickmanModule
             else 
                 onSomeRemaining?.Invoke();
         }
-        public void CrossTheBridge(Bridge bridge, Action onCrossDone)
-        {
-            moverPoint.Move(bridge.pathPoints[0]);
-            moverPoint.onDestinationReachedOnce = () =>
-            {
-                moverPath.Move(bridge.pathPoints.GetRange(1, bridge.pathPoints.Count-1));
-                moverPath.onDestinationReachedOnce = onCrossDone;
-            };
-        }
 
+        
 
-        public void AgentMode(Action onSet = null)
-        {
-            NavMeshAgent.enabled = false;
-            NavMeshObstacle.enabled = false;
-            StartCoroutine(EnableAgentAfter(onSet));
-        }
         IEnumerator EnableAgentAfter(Action onSet)
         {
             yield return new WaitForSeconds(.1f);
@@ -232,24 +243,11 @@ namespace _GAME_.Scripts.StickmanModule
             onSet?.Invoke();
         }
         
-
-        public void ObstacleMode(Action onSet = null)
-        {
-            NavMeshAgent.enabled = false;
-            NavMeshObstacle.enabled = false;
-            StartCoroutine(EnableObstacleAfter(onSet));
-        }
         IEnumerator EnableObstacleAfter(Action onSet)
         {
             yield return new WaitForSeconds(.1f);
             NavMeshObstacle.enabled = true;
             onSet?.Invoke();
-        }
-
-        private void SetStickmanState(StickmanState state)
-        {
-            currentState = state;
-            _onStateChanged?.Invoke(currentState);
         }
 
         private void RotateToFront(Action onDone)
