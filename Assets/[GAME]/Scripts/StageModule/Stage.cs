@@ -28,7 +28,7 @@ namespace _GAME_.Scripts.StageModule
 
         private void HandleBridgesCompleted()
         {
-            StageEvents.OnStageCompleted?.Invoke(this);
+            StageEvents.OnStageCompleted?.Invoke();
         }
     }
 }

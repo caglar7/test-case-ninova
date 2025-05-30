@@ -21,8 +21,9 @@ namespace _GAME_.Scripts.StageModule
 
         public float duration = 1f;
 
-        private int _agentCount;
-        private int _stickmanCount;
+        private int _currentStickmanCount;
+        
+        private int _targetStickmanCount;
 
         public void Init()
         {
@@ -30,18 +31,65 @@ namespace _GAME_.Scripts.StageModule
 
             FillFirstStageWithStickmen();
 
-            StageEvents.OnStageCompleted += HandleStageCompleted;
+            StageEvents.OnStageCompleted += MoveToNextStage;
         }
         private void OnDisable()
         {
-            StageEvents.OnStageCompleted -= HandleStageCompleted;
+            StageEvents.OnStageCompleted -= MoveToNextStage;
         }
-
-        private void HandleStageCompleted(Stage obj)
+        
+        
+        
+        
+        private void InitStages()
         {
+            foreach (Stage stage in stages)
+            {
+                stage.Init();
+            }
+        }
+        private void FillFirstStageWithStickmen()
+        {
+            stages[0].stickmanGrid.FillWithRandomStickmen();
         }
 
-        public void MoveToNextStage()
+        
+        
+        
+        private void MoveToNextStage()
+        {
+            GetStickmanCounts();
+
+            MoveStickmansFromSlots();
+            
+            MoveStickmansFromGrid();  
+            
+            MoveCamera();
+        }
+        private void GetStickmanCounts()
+        {
+            _targetStickmanCount = 0;
+            _currentStickmanCount = 0;
+            for (int i = 0; i < CurrentStage.stickmanSlotHandler.slots.Count; i++)
+            {
+                if (CurrentStage.stickmanSlotHandler.slots[i].IsFilled())
+                {
+                    _targetStickmanCount++;
+                }
+            }
+            for (int col = 0; col < 5; col++)
+            {
+                for (int row = 0; row < 5; row++)
+                {
+                    if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
+                        CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
+                    {
+                        _targetStickmanCount++;
+                    }
+                }
+            }
+        }
+        private void MoveStickmansFromSlots()
         {
             for (int i = 0; i < CurrentStage.stickmanSlotHandler.slots.Count; i++)
             {
@@ -53,50 +101,12 @@ namespace _GAME_.Scripts.StageModule
                     NextStage.stickmanSlotHandler.slots[i].FillSlot(stickman);
 
                     Bridge bridgeClosest = GeneralMethods.FindClosest(CurrentStage.bridgeHandler.bridges, 
-                                                                        stickman.Transform.position);
-                        
-                    MoveToNextStageSlots(stickman, bridgeClosest, i);
+                        stickman.Transform.position);
+                    MoveToNextStageSlot(stickman, bridgeClosest, i);
                 }
             }
-
-            _stickmanCount = 0;
-            _agentCount = 0;
-            for (int col = 0; col < 5; col++)
-            {
-                for (int row = 0; row < 5; row++)
-                {
-                    if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
-                        CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
-                    {
-                        _stickmanCount++;
-                    }
-                }
-            }   
-            for (int col = 0; col < 5; col++)
-            {
-                for (int row = 0; row < 5; row++)
-                {
-                    if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
-                        CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
-                    {
-                        stickman.AgentMode(() =>
-                        {
-                            CheckAgentCount(Step2);
-                        });
-                    }
-                }
-            }  
         }
-        
-        private void InitStages()
-        {
-            foreach (Stage stage in stages)
-            {
-                stage.Init();
-            }
-        }
-        
-        private void Step2()
+        private void MoveStickmansFromGrid()
         {
             for (int col = 0; col < 5; col++)
             {
@@ -108,55 +118,19 @@ namespace _GAME_.Scripts.StageModule
                         MoveToNextStageGrid(stickman, row, col);
                     }
                 }
-            }    
-            
-            BaseComponentFinder.instance.CameraManager
-                .ChangeAngle(currentStageIndex+1, duration);
-            
-            StartCoroutine(SetStageIndexAfter(duration));
-        }
-
-        private void CheckAgentCount(Action onAllAgent)
-        {
-            _agentCount++;
-            if (_agentCount == _stickmanCount)
-            {
-                onAllAgent?.Invoke();
             }
         }
-
-        IEnumerator SetStageIndexAfter(float f)
+        private void MoveCamera()
         {
-            yield return new WaitForSeconds(f);
-            currentStageIndex++;
+            BaseComponentFinder.instance.CameraManager.ChangeAngle(currentStageIndex+1, duration);
         }
 
-        private void MoveToNextStageGrid(Stickman stickman, int row, int col)
-        {
-            CurrentStage.stickmanGrid.GetSlot(row, col).ClearSlot();
 
-            NextStage.stickmanGrid.GetSlot(row, col).FillSlot(stickman);
-                        
-            Bridge bridgeClosest = GeneralMethods.FindClosest(CurrentStage.bridgeHandler.bridges, 
-                stickman.Transform.position);
-            
-            stickman.AgentMode(() =>
-            {
-                stickman.CrossTheBridge(bridgeClosest, () =>
-                {
-                    stickman.moverPoint.Move(NextStage.stickmanGrid.GetSlot(row, col).objectHolder.position);
-                    StartCoroutine(SetObstacleModeAfter(stickman, 1f));
-                });
-            });
-        }
 
-        IEnumerator SetObstacleModeAfter(Stickman stickman, float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            stickman.ObstacleMode();
-        }
+
         
-        private void MoveToNextStageSlots(Stickman stickman, Bridge bridgeClosest, int slotIndex)
+        
+        private void MoveToNextStageSlot(Stickman stickman, Bridge bridgeClosest, int slotIndex)
         {
             stickman.timer.PauseTimer();
             
@@ -165,16 +139,41 @@ namespace _GAME_.Scripts.StageModule
                 stickman.moverPoint.Move(NextStage.stickmanSlotHandler.slots[slotIndex].objectHolder.position);
                 stickman.moverPoint.onDestinationReachedOnce = () =>
                 {
+                    CheckStickmanCount();
                     stickman.timer.ResumeTimer();
                 };
             });
         }
-
-        private void FillFirstStageWithStickmen()
+        private void MoveToNextStageGrid(Stickman stickman, int row, int col)
         {
-            stages[0].stickmanGrid.FillWithRandomStickmen();
-        }
+            stickman.AgentMode(() =>
+            {
+                CurrentStage.stickmanGrid.GetSlot(row, col).ClearSlot();
 
- 
+                NextStage.stickmanGrid.GetSlot(row, col).FillSlot(stickman);
+                        
+                Bridge bridgeClosest = GeneralMethods.FindClosest(CurrentStage.bridgeHandler.bridges, 
+                    stickman.Transform.position);
+            
+                stickman.CrossTheBridge(bridgeClosest, () =>
+                {
+                    stickman.moverPoint.Move(NextStage.stickmanGrid.GetSlot(row, col).objectHolder.position);
+
+                    stickman.moverPoint.onDestinationReachedOnce = CheckStickmanCount;
+                });
+            });
+        }
+        private void CheckStickmanCount()
+        {
+            _currentStickmanCount++;
+            if (_currentStickmanCount == _targetStickmanCount)
+            {
+                SetToNextStage();
+            }
+        }
+        private void SetToNextStage()
+        {
+            currentStageIndex++;
+        }
     }
 }
