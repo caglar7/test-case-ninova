@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Template;
 using UnityEngine;
@@ -11,15 +12,22 @@ namespace _GAME_.Scripts.BridgeModule
         
         [SerializeField] private List<Bridge> availableBridges;
 
+        public int completedBridges;
 
+        public Action OnAllBridgesCompleted;
+        
         public void Init()
         {
+            completedBridges = 0;
+            
             foreach (Bridge bridge in bridges)
             {
                 bridge.Init();
+                bridge.OnBridgeCompleted += HandleBridgeCompleted;
             }
-        }
 
+            OnAllBridgesCompleted = null;
+        }
 
         public bool TryGetAvailableBridge(ColorType color, out Bridge bridge)
         {
@@ -61,6 +69,17 @@ namespace _GAME_.Scripts.BridgeModule
             }
 
             return true;
+        }
+        
+        
+        private void HandleBridgeCompleted()
+        {
+            completedBridges++;
+
+            if (completedBridges >= availableBridges.Count)
+            {
+                OnAllBridgesCompleted?.Invoke();
+            }
         }
     }
 }

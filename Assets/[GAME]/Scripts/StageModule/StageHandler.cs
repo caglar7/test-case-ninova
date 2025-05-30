@@ -29,8 +29,18 @@ namespace _GAME_.Scripts.StageModule
             InitStages();
 
             FillFirstStageWithStickmen();
+
+            StageEvents.OnStageCompleted += HandleStageCompleted;
         }
-        [Button]
+        private void OnDisable()
+        {
+            StageEvents.OnStageCompleted -= HandleStageCompleted;
+        }
+
+        private void HandleStageCompleted(Stage obj)
+        {
+        }
+
         public void MoveToNextStage()
         {
             for (int i = 0; i < CurrentStage.stickmanSlotHandler.slots.Count; i++)
@@ -49,9 +59,6 @@ namespace _GAME_.Scripts.StageModule
                 }
             }
 
-            
-            
-            
             _stickmanCount = 0;
             _agentCount = 0;
             for (int col = 0; col < 5; col++)
@@ -81,6 +88,13 @@ namespace _GAME_.Scripts.StageModule
             }  
         }
         
+        private void InitStages()
+        {
+            foreach (Stage stage in stages)
+            {
+                stage.Init();
+            }
+        }
         
         private void Step2()
         {
@@ -161,12 +175,6 @@ namespace _GAME_.Scripts.StageModule
             stages[0].stickmanGrid.FillWithRandomStickmen();
         }
 
-        private void InitStages()
-        {
-            foreach (Stage stage in stages)
-            {
-                stage.Init();
-            }
-        }
+ 
     }
 }

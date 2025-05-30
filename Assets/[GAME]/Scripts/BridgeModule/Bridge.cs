@@ -21,21 +21,20 @@ namespace _GAME_.Scripts.BridgeModule
         public Transform brickHolder;
         public List<Transform> pathPoints = new();
         
-        
         [Header("Resources")] 
         public GameObject blueprintPrefab;
         
-        
         private List<BrickBlueprint> _blueprints = new();
         private List<Brick> _bricks = new();
-
 
         public bool IsBridgeComplete => (_bricks.Count == _blueprints.Count) ? true : false;
         public int NextBlueprintIndex => _bricks.Count;
         public List<BrickBlueprint> BrickBlueprints => _blueprints;
         public int BrickCount => _bricks.Count;
-        
-        
+
+        public Action OnBridgeCompleted;
+            
+            
         public void Init()
         {
             _blueprints = new();
@@ -44,8 +43,9 @@ namespace _GAME_.Scripts.BridgeModule
                 _blueprints.Add(blueprint);
             }
             SetText();
+            OnBridgeCompleted = null;
         }
-        public void AddBrick(Brick brick)
+        public void AddBrick(Brick brick, float jumpDelay, Action onDropDone)
         {
             if (_bricks.Count >= _blueprints.Count)
             {
@@ -57,11 +57,14 @@ namespace _GAME_.Scripts.BridgeModule
 
             brick.Transform.SetParent(brickHolder);
             
-            JumpToBlueprintIndex(
-                brick, 
-                _bricks.Count-1, 
-                (_bricks.Count == _blueprints.Count) ? HandleLastBrick : SetText
-            );
+            GeneralUtils.Delay(jumpDelay, () =>
+            {
+                JumpToBlueprintIndex(
+                    brick, 
+                    _bricks.IndexOf(brick), 
+                    onDropDone
+                );
+            });
         }
         public int GetNextColorCount()
         {
@@ -77,7 +80,11 @@ namespace _GAME_.Scripts.BridgeModule
             return count;
         }
         
-
+        private void HandleLastBrick()
+        {
+            SetText();
+            OnBridgeCompleted?.Invoke();
+        }
         private void SetText()
         {
             txtCount.text = (_blueprints.Count - _bricks.Count).ToString();
@@ -99,12 +106,6 @@ namespace _GAME_.Scripts.BridgeModule
                 brick, 
                 Vector3.zero,
                 BrickSettings.Instance.brickRotateToRoad);
-        }
-
-        private void HandleLastBrick()
-        {
-            SetText();
-            BridgeEvents.OnRoadCompleted?.Invoke(this);
         }
         
 
@@ -137,21 +138,5 @@ namespace _GAME_.Scripts.BridgeModule
                 _blueprints.RemoveAt(0);
             }
         }
-
-        
-        
-#if UNITY_EDITOR
-
-        private void OnValidate()
-        {
-            _OnValidate();
-        }
-
-        private void _OnValidate()
-        {
-        }
-
-#endif
-  
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using _GAME_.Scripts.BrickModule;
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.ComponentAccess;
+using Sirenix.OdinInspector;
 using Template;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -27,9 +28,12 @@ namespace _GAME_.Scripts.StickmanModule
         [Header("Other")] 
         public List<ColorType> colorsExcluded = new();
 
-        private Action<StickmanState> _onStateChanged;
         public StickmanState currentState;
         
+        private Action<StickmanState> _onStateChanged;
+        private Action _currentOnDroppedAll;
+        private Action _currentOnSomeRemaining;
+
         public void Init()
         {
             input.Init();
@@ -109,6 +113,17 @@ namespace _GAME_.Scripts.StickmanModule
             brick.colorComponent.SetColor(color);
         }
 
+        [Button]
+        private void RemoveTopBrick()
+        {
+            BaseMono item = inventory.ItemList[^1];
+            
+            if (inventory.TryRemoveItem(item))
+            {
+                Destroy(item.gameObject);
+            }
+        }
+
         
         private void TryMoveToSlot()
         {
@@ -157,13 +172,11 @@ namespace _GAME_.Scripts.StickmanModule
             if (ComponentFinder.instance.BridgeHandler
                 .TryGetAvailableBridge(colorComponent.currentColor, out Bridge bridge))
             {
-                StartCoroutine
-                (
-                    DropBricksOnBridge(
-                        bridge, 
-                        bridge.GetNextColorCount(),
-                        onSomeRemaining,
-                        onDroppedAll)            
+                DropBricks(
+                    bridge,
+                    bridge.GetNextColorCount(),
+                    onSomeRemaining, 
+                    onDroppedAll
                 );
             }
             else
@@ -207,33 +220,38 @@ namespace _GAME_.Scripts.StickmanModule
         }
         
 
-        IEnumerator DropBricksOnBridge(
+        private void DropBricks(
             Bridge bridge,
             int dropCount,
             Action onSomeRemaining,
             Action onDroppedAll)
         {
-            yield return new WaitForSeconds(0.35f);
-
+            _currentOnSomeRemaining = onSomeRemaining;
+            _currentOnDroppedAll = onDroppedAll;
+            
             int count = Mathf.Clamp(dropCount, 0, inventory.ItemList.Count);
             
             for (int i = 0; i < count; i++)
             {
                 BaseMono item = inventory.ItemList[^1];
+                
                 if (inventory.TryRemoveItem(item))
                 {
-                    bridge.AddBrick((Brick) item);
+                    bridge.AddBrick(
+                        (Brick) item, 
+                        i * 0.07f, 
+                        (i == count-1) ? HandleLastDrop : null
+                    );
                 }
-                    
-                yield return new WaitForSeconds(0.07f);
             }
-            
-            if(inventory.ItemList.Count == 0)
-                onDroppedAll?.Invoke();
-            else 
-                onSomeRemaining?.Invoke();
         }
-
+        private void HandleLastDrop()
+        {
+            if(inventory.ItemList.Count == 0)
+                _currentOnDroppedAll?.Invoke();
+            else 
+                _currentOnSomeRemaining?.Invoke();
+        }
         
 
         IEnumerator EnableAgentAfter(Action onSet)

@@ -1,3 +1,4 @@
+using System;
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.Movement;
 using _GAME_.Scripts.SlotModule;
@@ -17,6 +18,17 @@ namespace _GAME_.Scripts.StageModule
         {
             bridgeHandler.Init();
             stickmanGrid.Init();
+
+            bridgeHandler.OnAllBridgesCompleted += HandleBridgesCompleted;
+        }
+        private void OnDisable()
+        {   
+            bridgeHandler.OnAllBridgesCompleted -= HandleBridgesCompleted;
+        }
+
+        private void HandleBridgesCompleted()
+        {
+            StageEvents.OnStageCompleted?.Invoke(this);
         }
     }
 }
