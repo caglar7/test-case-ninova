@@ -1,4 +1,5 @@
 using _GAME_.Scripts.ComponentAccess;
+using _GAME_.Scripts.StageModule;
 using _GAME_.Scripts.StickmanModule;
 using Template;
 using UnityEngine.Serialization;
@@ -14,17 +15,21 @@ namespace _GAME_.Scripts.GameStateModule
             timerFail.RemoveListeners();
             timerFail.OnTimerDone += CheckFail;
             StickmanEvents.OnMadeMove += timerFail.StartTimer;
+
+            StageEvents.OnAllStagesDone += CheckComplete;
         }
 
         public override void UnsubscribeToEvents()
         {
             StickmanEvents.OnMadeMove -= timerFail.StartTimer;
+            
+            StageEvents.OnAllStagesDone -= CheckComplete;
         }
 
         public override bool IsCompleted()
         {
-            // to do
-            return false;
+            // check is enough for our case
+            return true;
         }
 
         public override bool IsFailed()

@@ -73,7 +73,6 @@ namespace Template
         {
             previousState = currentState;
             currentState = state;
-            print("current state: " + currentState.ToString());
         }
         
         

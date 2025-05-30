@@ -220,7 +220,7 @@ namespace _GAME_.Scripts.StageModule
         }
         private void HandleLastReached()
         {
-            StageEvents.OnLevelFinished?.Invoke();
+            StageEvents.OnAllStagesDone?.Invoke();
         }
         private void MoveCameraToFinish()
         {
