@@ -1,4 +1,5 @@
 using _GAME_.Scripts.BridgeModule;
+using _GAME_.Scripts.FinishModule;
 using _GAME_.Scripts.SlotModule;
 using _GAME_.Scripts.StageModule;
 using Template;
@@ -10,8 +11,18 @@ namespace _GAME_.Scripts.ComponentAccess
         private StickmanSlotHandler _slotHandler;
         private BridgeHandler _bridgeHandler;
         private StageHandler _stageHandler;
+        private FinishHandler _finishHandler;
 
+        public FinishHandler FinishHandler
+        {
+            get
+            {
+                if (_finishHandler == null)
+                    _finishHandler = FindObjectOfType<FinishHandler>();
 
+                return _finishHandler;
+            }
+        }
         public StageHandler StageHandler
         {
             get

@@ -10,15 +10,15 @@ namespace _GAME_.Scripts.BridgeModule
     {
         public List<Bridge> bridges = new();
         
-        [SerializeField] private List<Bridge> availableBridges;
+        private List<Bridge> _availableBridges = new();
 
-        public int completedBridges;
+        private int _completedBridges;
 
         public Action OnAllBridgesCompleted;
         
         public void Init()
         {
-            completedBridges = 0;
+            _completedBridges = 0;
             
             foreach (Bridge bridge in bridges)
             {
@@ -31,7 +31,7 @@ namespace _GAME_.Scripts.BridgeModule
 
         public bool TryGetAvailableBridge(ColorType color, out Bridge bridge)
         {
-            availableBridges = new();
+            _availableBridges = new();
              
             foreach (Bridge b in bridges)
             {
@@ -40,17 +40,17 @@ namespace _GAME_.Scripts.BridgeModule
                 
                 if (b.BrickBlueprints[b.NextBlueprintIndex].colorComponent.currentColor == color)
                 {
-                    availableBridges.Add(b);
+                    _availableBridges.Add(b);
                 }
             }
                       
-            availableBridges.Sort((bridgeA, bridgeB) =>
+            _availableBridges.Sort((bridgeA, bridgeB) =>
                 bridgeA.BrickCount > bridgeB.BrickCount ? 1 : -1
             );
 
-            if (availableBridges.Count > 0)
+            if (_availableBridges.Count > 0)
             {
-                bridge = availableBridges[0];
+                bridge = _availableBridges[0];
                 return true;
             }
             else
@@ -74,9 +74,9 @@ namespace _GAME_.Scripts.BridgeModule
         
         private void HandleBridgeCompleted()
         {
-            completedBridges++;
+            _completedBridges++;
 
-            if (completedBridges >= bridges.Count)
+            if (_completedBridges >= bridges.Count)
             {
                 OnAllBridgesCompleted?.Invoke();
             }

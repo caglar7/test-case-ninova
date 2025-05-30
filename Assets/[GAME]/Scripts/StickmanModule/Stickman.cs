@@ -41,13 +41,6 @@ namespace _GAME_.Scripts.StickmanModule
             moverPath.Init();
             inventory.Init();
             
-            ColorType stickmanColor = GeneralMethods.GetRandomEnumValueExcluding(colorsExcluded);
-            for (int i = 0; i < Random.Range(6, 10); i++)
-            {
-                AddBrick(stickmanColor);
-            }
-            colorComponent.SetColor(stickmanColor);
-            
             input.MouseDown += HandleInput;
             _onStateChanged = null;
             _onStateChanged += stickmanAnimation.HandleAnimation;
@@ -55,6 +48,13 @@ namespace _GAME_.Scripts.StickmanModule
             SetStickmanState(StickmanState.CarryIdle); 
             ObstacleMode();
         }
+        private void Update()
+        {
+            moverPoint.OnUpdate();
+            moverPath.OnUpdate();
+        }
+        
+        
         public void CrossTheBridge(Bridge bridge, Action onCrossDone)
         {
             moverPoint.Move(bridge.pathPoints[0]);
@@ -81,13 +81,49 @@ namespace _GAME_.Scripts.StickmanModule
             NavMeshObstacle.enabled = false;
             StartCoroutine(EnableObstacleAfter(onSet));
         }
-        
-
-        private void Update()
+        public void AddBrick()
         {
-            moverPoint.OnUpdate();
-            moverPath.OnUpdate();
+            Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
+            inventory.TryAddItem(brick);
         }
+        public void AddBrick(ColorType color)
+        {
+            Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
+            inventory.TryAddItem(brick);
+            brick.colorComponent.SetColor(color);
+        }
+        public void AddBricks(ColorType color, int amount)
+        {
+            StartCoroutine(AddBricksAsync(color, amount));
+        }
+        IEnumerator AddBricksAsync(ColorType color, int amount)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
+                inventory.TryAddItem(brick);
+                brick.colorComponent.SetColor(color);
+                yield return null;
+            }
+        }
+        public void RotateToFront(Action onDone = null)
+        {
+            TweenRotation.RotateGlobal(
+                this, 
+                Vector3.zero, 
+                StickmanSettings.Instance.rotationToFrontSettings,
+                onDone);
+        }
+        public void RotateToBack(Action onDone = null)
+        {
+            TweenRotation.RotateGlobal(
+                this, 
+                new Vector3(0f, 180f, 0f), 
+                StickmanSettings.Instance.rotationToBackSettings,
+                onDone);
+        }
+        
+        
 
         private void HandleInput()
         {
@@ -99,31 +135,6 @@ namespace _GAME_.Scripts.StickmanModule
             
             AgentMode(TryMoveToSlot);
         }
-        
-        private void AddBrick()
-        {
-            Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
-            inventory.TryAddItem(brick);
-        }
-        private void AddBrick(ColorType color)
-        {
-            Brick brick = Instantiate(brickPrefab).GetComponent<Brick>();
-            inventory.TryAddItem(brick);
-            brick.colorComponent.SetColor(color);
-        }
-
-        [Button]
-        private void RemoveTopBrick()
-        {
-            BaseMono item = inventory.ItemList[^1];
-            
-            if (inventory.TryRemoveItem(item))
-            {
-                Destroy(item.gameObject);
-            }
-        }
-
-        
         private void TryMoveToSlot()
         {
             Vector3 target = ComponentFinder.instance.StageHandler.CurrentStage.points.pointOutsideOfGrid.position;
@@ -265,23 +276,6 @@ namespace _GAME_.Scripts.StickmanModule
             yield return new WaitForSeconds(.1f);
             NavMeshObstacle.enabled = true;
             onSet?.Invoke();
-        }
-
-        private void RotateToFront(Action onDone)
-        {
-            TweenRotation.RotateGlobal(
-                this, 
-                Vector3.zero, 
-                StickmanSettings.Instance.rotationToFrontSettings,
-                onDone);
-        }
-        private void RotateToBack(Action onDone)
-        {
-            TweenRotation.RotateGlobal(
-                this, 
-                new Vector3(0f, 180f, 0f), 
-                StickmanSettings.Instance.rotationToBackSettings,
-                onDone);
         }
     }
 }

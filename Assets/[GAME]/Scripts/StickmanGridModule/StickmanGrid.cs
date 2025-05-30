@@ -10,28 +10,35 @@ namespace _GAME_.Scripts.StickmanGridModule
         [Header("Stickman Grid")] 
         public GameObject stickmanPrefab;
 
-        private List<Stickman> _stickmans = new();
+        [Header("Edit Spawn Data")] 
+        public List<StickmanSpawnData> SpawnDatas = new();
         
         
         public void FillWithRandomStickmen()
         {
-            for (int row = 0; row < rowCount; row++)
+            int row = 0;
+            int column = 0;
+
+            for (int i = 0; i < SpawnDatas.Count; i++)
             {
-                for (int column = 0; column < columnCount; column++)
-                {
-                    Stickman stickman = Instantiate(stickmanPrefab).GetComponent<Stickman>();
+                row = i / 5;
+                column = i % 5;
+                
+                Stickman stickman = Instantiate(stickmanPrefab).GetComponent<Stickman>();
 
-                    stickman.Init();
-
-                    stickman.Transform.name = "Stickman " +  (_stickmans.Count + 1).ToString();
+                stickman.Init();
                     
-                    FillSlot(stickman, row, column);
-                    
-                    _stickmans.Add(stickman);
+                stickman.colorComponent.SetColor(SpawnDatas[i].ColorType);
+                
+                stickman.AddBricks(SpawnDatas[i].ColorType, SpawnDatas[i].BrickCount);
+                
+                stickman.Transform.position = GetSlot(row, column).objectHolder.position;
 
-                    stickman.Transform.position = GetSlot(row, column).objectHolder.position;
-                }
+                stickman.Transform.name = "Stickman " + (i + 1);
+
+                FillSlot(stickman, row, column);
             }
+
         }
         
         public override void FillSlot(BaseMono obj, int row, int column)

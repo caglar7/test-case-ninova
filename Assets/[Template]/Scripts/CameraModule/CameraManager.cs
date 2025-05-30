@@ -33,7 +33,12 @@ public class CameraManager : BaseMono, IModuleInit
     {
         ChangeAngle(cameraUnits[index].angleType);
     }
-    [Button]
+
+    public void ChangeAngle(CameraUnit unit, float duration)
+    {
+        unit.easeDuration = duration;
+        ChangeAngle(unit.angleType);
+    }
     public void ChangeAngle(int index, float duration)
     {
         cameraUnits[index].easeDuration = duration;
