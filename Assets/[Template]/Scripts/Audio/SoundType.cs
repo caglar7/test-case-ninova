@@ -4,7 +4,7 @@ namespace Template
     {
         Button,
         Tap,
-        BrickPlaced,
+        BrickDropped,
         StagePassed,
         LevelCompleted,
         LevelFailed,

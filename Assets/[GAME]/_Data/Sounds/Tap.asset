@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 684ddb1d89b3c9d48a94414c90950d00, type: 3}
   m_Name: Tap
   m_EditorClassIdentifier: 
-  soundType: 0
-  clip: {fileID: 0}
-  volume: 0.1
+  soundType: 1
+  clip: {fileID: 8300000, guid: db0f75393df0f0d4193517e11b7e6b7d, type: 3}
+  volume: 0.5
   basePitch: 1
   isLooping: 0
   source: {fileID: 0}

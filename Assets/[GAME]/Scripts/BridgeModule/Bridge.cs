@@ -61,15 +61,20 @@ namespace _GAME_.Scripts.BridgeModule
             
             GeneralUtils.Delay(jumpDelay, () =>
             {
+                BridgeEvents.OnBrickDropped?.Invoke();
+                
                 JumpToBlueprintIndex(
                     brick, 
                     _bricks.IndexOf(brick),
                     () =>
                     {
-                        onDropDone?.Invoke();
                         SetText();
                         
                         HandleLastBrick();
+
+                        onDropDone?.Invoke();
+                        
+                        BridgeEvents.OnBrickPlaced?.Invoke();
                     }
                 );
             });

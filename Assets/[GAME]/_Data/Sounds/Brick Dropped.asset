@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 684ddb1d89b3c9d48a94414c90950d00, type: 3}
-  m_Name: Brick Placed
+  m_Name: Brick Dropped
   m_EditorClassIdentifier: 
-  soundType: 0
-  clip: {fileID: 0}
-  volume: 0.1
+  soundType: 2
+  clip: {fileID: 8300000, guid: 2f7ce8e045c554e4583fa49c9d1412a2, type: 3}
+  volume: 0.15
   basePitch: 1
   isLooping: 0
   source: {fileID: 0}

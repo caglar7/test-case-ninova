@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Button
   m_EditorClassIdentifier: 
   soundType: 0
-  clip: {fileID: 0}
-  volume: 0.1
+  clip: {fileID: 8300000, guid: d1c7c73564985f948bac5b1133dba804, type: 3}
+  volume: 0.5
   basePitch: 1
   isLooping: 0
   source: {fileID: 0}
