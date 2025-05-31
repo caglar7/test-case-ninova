@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: Play Pact
-  productName: Game Name
+  companyName: Test
+  productName: Case Game
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.18823531, g: 0.09411766, b: 0.4039216, a: 1}
