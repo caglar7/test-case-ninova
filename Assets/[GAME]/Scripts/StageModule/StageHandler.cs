@@ -198,32 +198,34 @@ namespace _GAME_.Scripts.StageModule
         }
         private void MoveStickmanToFinishSlot(Stickman stickman, int slotIndex, Action onMoveDone = null)
         {
-            ComponentFinder.instance.FinishHandler.finishSlotHandler.slots[slotIndex]
-                .FillSlot(stickman);
-            
-            Bridge bridgeClosest = GeneralMethods.FindClosest(CurrentStage.bridgeHandler.bridges, 
-                stickman.Transform.position);
-            
-            stickman.SetStickmanState(StickmanState.CarryRunning);
-            
-            stickman.CrossTheBridge(bridgeClosest, () =>
+            stickman.AgentMode(() =>
             {
-                stickman.moverPoint.Move(
-                    ComponentFinder.instance.FinishHandler.finishSlotHandler.slots[slotIndex].Transform.position
-                );
-
-                stickman.moverPoint.onDestinationReachedOnce = () =>
+                ComponentFinder.instance.FinishHandler.finishSlotHandler.slots[slotIndex]
+                    .FillSlot(stickman);
+            
+                Bridge bridgeClosest = GeneralMethods.FindClosest(CurrentStage.bridgeHandler.bridges, 
+                    stickman.Transform.position);
+            
+                stickman.SetStickmanState(StickmanState.CarryRunning);
+            
+                stickman.CrossTheBridge(bridgeClosest, () =>
                 {
-                    stickman.SetStickmanState(StickmanState.CarryIdle);
+                    stickman.moverPoint.Move(
+                        ComponentFinder.instance.FinishHandler.finishSlotHandler.slots[slotIndex].Transform.position
+                    );
+
+                    stickman.moverPoint.onDestinationReachedOnce = () =>
+                    {
+                        stickman.SetStickmanState(StickmanState.CarryIdle);
                     
-                    onMoveDone?.Invoke();
-                };
+                        onMoveDone?.Invoke();
+                    };
+                });
             });
         }
         private void HandleLastReached()
         {
             StageEvents.OnAllStagesDone?.Invoke();
-            print("StageEvents.OnAllStagesDone?.Invoke()");
         }
         private void MoveCameraToFinish()
         {
