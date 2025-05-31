@@ -53,8 +53,14 @@ namespace _GAME_.Scripts.StickmanModule
             moverPoint.OnUpdate();
             moverPath.OnUpdate();
         }
-        
-        
+
+        private void OnDisable()
+        {
+            timer.RemoveListeners();
+            timer.PauseTimer();
+        }
+
+
         public void CrossTheBridge(Bridge bridge, Action onCrossDone)
         {
             moverPoint.Move(bridge.pathPoints[0]);

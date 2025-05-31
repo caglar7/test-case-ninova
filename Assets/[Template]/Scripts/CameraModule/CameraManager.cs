@@ -26,7 +26,16 @@ public class CameraManager : BaseMono, IModuleInit
 
     public void Init()
     {
-        ChangeAngle(defaultAngle);
+        GameStateEvents.OnLevelStarted += HandleLevelStarted;
+    }
+    private void OnDisable()
+    {
+        GameStateEvents.OnLevelStarted += HandleLevelStarted;
+    }
+
+    private void HandleLevelStarted()
+    {
+        ChangeAngle(0);
     }
 
     public void ChangeAngle(int index)

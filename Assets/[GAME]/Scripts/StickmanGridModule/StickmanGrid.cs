@@ -26,9 +26,9 @@ namespace _GAME_.Scripts.StickmanGridModule
                 
                 Stickman stickman = Instantiate(stickmanPrefab).GetComponent<Stickman>();
 
-                stickman.Init();
-                    
                 stickman.colorComponent.SetColor(SpawnDatas[i].ColorType);
+                
+                stickman.Init();
                 
                 stickman.AddBricks(SpawnDatas[i].ColorType, SpawnDatas[i].BrickCount);
                 

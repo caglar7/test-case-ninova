@@ -12,15 +12,19 @@ namespace _GAME_.Scripts.GameStateModule
         
         public override void SubscribeToEvents()
         {
+            LevelEvents.OnLevelLoaded += LevelStarted;
+            
             timerFail.RemoveListeners();
             timerFail.OnTimerDone += CheckFail;
             StickmanEvents.OnMadeMove += timerFail.StartTimer;
-
+            
             StageEvents.OnAllStagesDone += CheckComplete;
         }
 
         public override void UnsubscribeToEvents()
         {
+            LevelEvents.OnLevelLoaded -= LevelStarted;
+            
             StickmanEvents.OnMadeMove -= timerFail.StartTimer;
             
             StageEvents.OnAllStagesDone -= CheckComplete;
@@ -28,7 +32,6 @@ namespace _GAME_.Scripts.GameStateModule
 
         public override bool IsCompleted()
         {
-            // check is enough for our case
             return true;
         }
 

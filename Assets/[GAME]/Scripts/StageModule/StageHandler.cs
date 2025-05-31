@@ -141,7 +141,7 @@ namespace _GAME_.Scripts.StageModule
         private void MoveCamera()
         {
             BaseComponentFinder.instance.CameraManager.ChangeAngle(
-                NextStage.cameraUnit, 
+                _currentStageIndex + 1, 
                 duration
             );
         }
@@ -152,7 +152,8 @@ namespace _GAME_.Scripts.StageModule
             
             MoveStickmansToFinishLine();
 
-            MoveCameraToFinish();
+            MoveCamera();
+            // MoveCameraToFinish();
         }
 
         private void GetRemainingStickmans()
@@ -164,7 +165,8 @@ namespace _GAME_.Scripts.StageModule
                 {
                     if (CurrentStage.stickmanSlotHandler.slots[i].currentObject is Stickman stickman)
                     {
-                        _stickmansRemaining.Add(stickman);
+                        if(stickman.inventory.ItemList.Count > 0)
+                            _stickmansRemaining.Add(stickman);
                     }
                 }
             }
@@ -221,6 +223,7 @@ namespace _GAME_.Scripts.StageModule
         private void HandleLastReached()
         {
             StageEvents.OnAllStagesDone?.Invoke();
+            print("StageEvents.OnAllStagesDone?.Invoke()");
         }
         private void MoveCameraToFinish()
         {

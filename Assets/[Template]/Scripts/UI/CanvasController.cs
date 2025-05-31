@@ -18,16 +18,9 @@ namespace Template
 {
     public class CanvasController : Singleton<CanvasController>, IModuleInit
     {
-        [Header("References")] 
-        public Canvas canvas;
-        public RectTransform canvasRT;
-        
         [Header("General")]
         public CanvasType startPanel;
 
-        [Header("Elements")] 
-        public SourceUI goldSourceUI;
-        
         private SubCanvas[] subCanvases;
         
         
@@ -36,36 +29,17 @@ namespace Template
             subCanvases = GetComponentsInChildren<SubCanvas>(true);
             
             SwitchCanvas(startPanel);
-        }
 
-        
-        // public void AddCoin(Transform point) => AddCoin(point.position);
-        // public void AddCoin(Vector3 spawnPosition)
-        // {
-        //     CoinUI coinUI = ComponentFinder.instance.ObjectCreator.CreateCoinUI();
-        //     
-        //     coinUI.transform.SetParent(canvas.transform);
-        //     
-        //     coinUI.RectTransform.anchoredPosition = UIUtility.WorldToUI(
-        //                                                 spawnPosition, 
-        //                                                 canvas,
-        //                                                 canvasRT,
-        //                                                 ComponentFinder.instance.MainCamera);
-        //     
-        //     DotweenExtensions.SafePunchScale(coinUI.transform, 1.3f, 1f, .3f, (() =>
-        //     {
-        //         ItemTransfer.TransferBaseUI(
-        //             coinUI, 
-        //             goldSourceUI.icon.rectTransform, 
-        //             canvasRT,
-        //             UISettings.Instance.addCoinSettings,
-        //             () =>
-        //             {
-        //                 ComponentFinder.instance.SourceManager.AddSource(SourceType.Gold, coinUI.sourceAmount);
-        //                 ComponentFinder.instance.ObjectCreator.RemoveCoinUI(coinUI);
-        //             });
-        //     }));
-        // }
+            GameStateEvents.OnLevelStarted += GamePanel;
+            GameStateEvents.OnLevelCompleted += LevelCompletedPanel;
+            GameStateEvents.OnLevelFailed += LevelFailedPanel;
+        }
+        private void OnDisable()
+        {
+            GameStateEvents.OnLevelStarted -= GamePanel;
+            GameStateEvents.OnLevelCompleted -= LevelCompletedPanel;
+            GameStateEvents.OnLevelFailed -= LevelFailedPanel;  
+        }
         
         public void GamePanel() => SwitchCanvas(CanvasType.GamePanel);
         public void LevelCompletedPanel() => SwitchCanvas(CanvasType.SuccessPanel);
