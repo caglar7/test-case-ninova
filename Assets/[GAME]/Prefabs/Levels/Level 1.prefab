@@ -5186,9 +5186,9 @@ MonoBehaviour:
   - ColorType: 0
     BrickCount: 5
   - ColorType: 1
-    BrickCount: 5
+    BrickCount: 6
   - ColorType: 1
-    BrickCount: 5
+    BrickCount: 4
   - ColorType: 0
     BrickCount: 7
   - ColorType: 0
