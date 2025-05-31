@@ -10865,7 +10865,7 @@ MonoBehaviour:
   - ColorType: 1
     BrickCount: 5
   - ColorType: 0
-    BrickCount: 8
+    BrickCount: 7
   - ColorType: 0
     BrickCount: 4
   - ColorType: 2
@@ -27807,8 +27807,8 @@ MonoBehaviour:
   stages:
   - {fileID: 622068800238903552}
   - {fileID: 622068799989601556}
-  duration: 2
-  durationFinish: 2
+  camBlendDuration: 2
+  finishDuration: 1.5
 --- !u!1 &622068801249137706
 GameObject:
   m_ObjectHideFlags: 0

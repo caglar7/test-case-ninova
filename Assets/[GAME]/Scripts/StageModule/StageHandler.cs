@@ -8,6 +8,7 @@ using Sirenix.OdinInspector;
 using Template;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _GAME_.Scripts.StageModule
 {
@@ -15,9 +16,8 @@ namespace _GAME_.Scripts.StageModule
     {
         public List<Stage> stages = new();
         
-        public float duration = 1f;
-
-        public float durationFinish = 1f;
+        public float camBlendDuration = 1f;
+        public float finishDuration = 2f;
         
         public Stage CurrentStage => stages[_currentStageIndex];
         public Stage NextStage => stages[_currentStageIndex + 1];
@@ -79,7 +79,7 @@ namespace _GAME_.Scripts.StageModule
             
             MoveStickmansFromGrid();  
             
-            MoveCamera();
+            MoveCamera(camBlendDuration);
         }
         private void GetStickmanCounts()
         {
@@ -138,11 +138,11 @@ namespace _GAME_.Scripts.StageModule
                 }
             }
         }
-        private void MoveCamera()
+        private void MoveCamera(float blendDuration)
         {
             BaseComponentFinder.instance.CameraManager.ChangeAngle(
                 _currentStageIndex + 1, 
-                duration
+                blendDuration
             );
         }
 
@@ -152,8 +152,9 @@ namespace _GAME_.Scripts.StageModule
             
             MoveStickmansToFinishLine();
 
-            MoveCamera();
-            // MoveCameraToFinish();
+            MoveCamera(camBlendDuration);
+            
+            InvokeDoneAfterDelay();
         }
 
         private void GetRemainingStickmans()
@@ -190,8 +191,7 @@ namespace _GAME_.Scripts.StageModule
                 {
                     MoveStickmanToFinishSlot(
                         _stickmansRemaining[i], 
-                        i, 
-                        (i == _stickmansRemaining.Count-1) ? HandleLastReached : null
+                        i 
                     );
                 }
             }
@@ -223,16 +223,13 @@ namespace _GAME_.Scripts.StageModule
                 });
             });
         }
-        private void HandleLastReached()
+        private void InvokeDoneAfterDelay()
+        {
+            GeneralUtils.Delay(finishDuration, InvokeDoneEvent);
+        }
+        private void InvokeDoneEvent()
         {
             StageEvents.OnAllStagesDone?.Invoke();
-        }
-        private void MoveCameraToFinish()
-        {
-            BaseComponentFinder.instance.CameraManager.ChangeAngle(
-                ComponentFinder.instance.FinishHandler.cameraUnit, 
-                durationFinish
-            );
         }
 
 
