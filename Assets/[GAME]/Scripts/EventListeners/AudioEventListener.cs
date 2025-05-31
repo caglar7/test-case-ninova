@@ -21,15 +21,22 @@ namespace _GAME_.Scripts.EventListeners
             StageEvents.OnStageCompleted += HandleStageCompleted;
             GameStateEvents.OnLevelCompleted += HandleLevelCompleted;
             GameStateEvents.OnLevelFailed += HandleLevelFailed;
+            StickmanEvents.OnWrongMove += HandleWrongMove;
         }
         private void OnDisable()
         {
-            UIEvents.OnButtonClicked += HandleButtonClicked;
+            UIEvents.OnButtonClicked -= HandleButtonClicked;
             BridgeEvents.OnBrickDropped -= HandleBrickDropped;
             StickmanEvents.OnMadeMove -= HandleMadeMove;
             StageEvents.OnStageCompleted -= HandleStageCompleted;
-            GameStateEvents.OnLevelCompleted += HandleLevelCompleted;
-            GameStateEvents.OnLevelFailed += HandleLevelFailed;
+            GameStateEvents.OnLevelCompleted -= HandleLevelCompleted;
+            GameStateEvents.OnLevelFailed -= HandleLevelFailed;
+            StickmanEvents.OnWrongMove -= HandleWrongMove;
+        }
+
+        private void HandleWrongMove()
+        {
+            controller.PlayOneShot(SoundType.WrongMove);
         }
 
         private void HandleLevelFailed()

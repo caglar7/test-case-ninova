@@ -3643,6 +3643,7 @@ MonoBehaviour:
   stickmanSlotHandler: {fileID: 622068801137702272}
   stickmanGrid: {fileID: 622068801015999056}
   points: {fileID: 622068801464246835}
+  borderBack: {fileID: 622068801410013560}
   isFinalStage: 1
 --- !u!1 &622068800113356397
 GameObject:
@@ -3760,6 +3761,7 @@ MonoBehaviour:
   stickmanSlotHandler: {fileID: 622068800311695551}
   stickmanGrid: {fileID: 622068800294841836}
   points: {fileID: 622068799900857451}
+  borderBack: {fileID: 622068799987557862}
   isFinalStage: 0
 --- !u!1 &622068800294841826
 GameObject:

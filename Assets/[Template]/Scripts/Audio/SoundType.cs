@@ -8,5 +8,6 @@ namespace Template
         StagePassed,
         LevelCompleted,
         LevelFailed,
+        WrongMove,
     }
 }

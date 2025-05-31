@@ -15,6 +15,7 @@ namespace _GAME_.Scripts.StageModule
         public StickmanSlotHandler stickmanSlotHandler;
         public StickmanGrid stickmanGrid;
         public Points points;
+        public GameObject borderBack;
         
         [Header("Settings")] 
         public bool isFinalStage;

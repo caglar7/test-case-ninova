@@ -303,11 +303,17 @@ namespace _GAME_.Scripts.StageModule
             if (_currentStickmanCount == _targetStickmanCount)
             {
                 SetToNextStage();
+                ActivateStageBorder();
             }
         }
+
         private void SetToNextStage()
         {
             _currentStageIndex++;
+        }
+        private void ActivateStageBorder()
+        {
+            CurrentStage.borderBack.SetActive(true);            
         }
     }
 }

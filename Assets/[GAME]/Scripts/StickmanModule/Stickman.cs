@@ -133,9 +133,9 @@ namespace _GAME_.Scripts.StickmanModule
 
         private void HandleInput()
         {
-            // is there slot
             if (ComponentFinder.instance.SlotHandler.AreSlotsFull())
             {
+                StickmanEvents.OnWrongMove?.Invoke();
                 return;
             }
             
@@ -171,8 +171,9 @@ namespace _GAME_.Scripts.StickmanModule
             }
             else
             {
-                print("stickman cannot move");
                 ObstacleMode();
+                
+                StickmanEvents.OnWrongMove?.Invoke();
             }
         }
 
