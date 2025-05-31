@@ -47,8 +47,6 @@ namespace _GAME_.Scripts.StickmanModule
             
             SetStickmanState(StickmanState.CarryIdle); 
             ObstacleMode();
-            
-            
         }
         private void Update()
         {
@@ -87,6 +85,7 @@ namespace _GAME_.Scripts.StickmanModule
         }
         public void AgentMode(Action onSet = null)
         {
+            input.isInputActive = false;
             NavMeshAgent.enabled = false;
             NavMeshObstacle.enabled = false;
             StartCoroutine(EnableAgentAfter(onSet));
@@ -184,8 +183,6 @@ namespace _GAME_.Scripts.StickmanModule
 
                         RotateToFront(HandleReachedSlot);
                     };
-
-                    input.isInputActive = false;
                     
                     StickmanEvents.OnMadeMove?.Invoke();
                 }
@@ -305,6 +302,7 @@ namespace _GAME_.Scripts.StickmanModule
         {
             yield return new WaitForSeconds(.1f);
             NavMeshObstacle.enabled = true;
+            input.isInputActive = true;
             onSet?.Invoke();
         }
     }

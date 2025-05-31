@@ -89,7 +89,9 @@ namespace _GAME_.Scripts.StageModule
             _currentStickmanCount = 0;
             for (int i = 0; i < CurrentStage.stickmanSlotHandler.slots.Count; i++)
             {
-                if (CurrentStage.stickmanSlotHandler.slots[i].IsFilled())
+                if (CurrentStage.stickmanSlotHandler.slots[i].IsFilled() && 
+                    CurrentStage.stickmanSlotHandler.slots[i].currentObject is Stickman stickman &&
+                    stickman.inventory.ItemList.Count > 0)
                 {
                     _targetStickmanCount++;
                 }
@@ -111,7 +113,8 @@ namespace _GAME_.Scripts.StageModule
             for (int i = 0; i < CurrentStage.stickmanSlotHandler.slots.Count; i++)
             {
                 if (CurrentStage.stickmanSlotHandler.slots[i].IsFilled() &&
-                    CurrentStage.stickmanSlotHandler.slots[i].currentObject is Stickman stickman)
+                    CurrentStage.stickmanSlotHandler.slots[i].currentObject is Stickman stickman &&
+                    stickman.inventory.ItemList.Count > 0)
                 {
                     CurrentStage.stickmanSlotHandler.slots[i].ClearSlot();
                     
@@ -298,11 +301,8 @@ namespace _GAME_.Scripts.StageModule
         private IEnumerator SetObstacleModeAsync(Stickman stickman, float delay)
         {
             yield return new WaitForSeconds(delay);
-            
-            stickman.ObstacleMode(() =>
-            {
-                stickman.input.isInputActive = true;
-            });
+
+            stickman.ObstacleMode();
         }
 
         private void CheckStickmanCount()
