@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using _GAME_.Scripts.BrickModule;
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.ComponentAccess;
-using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor.StateUpdaters;
 using Template;
 using UnityEngine;
 using Random = UnityEngine.Random;
