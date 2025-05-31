@@ -5,7 +5,7 @@ namespace Template
         Red,
         Green,
         Blue,
-        Brown,
+        Yellow,
         Purple,
         DarkGrey,
     }
