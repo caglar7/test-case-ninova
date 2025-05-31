@@ -6,5 +6,6 @@ namespace _GAME_.Scripts.StageModule
     {
         public static Action<Stage> OnStageCompleted;
         public static Action OnAllStagesDone;
+        public static Action StageTransitionStarted;
     }
 }

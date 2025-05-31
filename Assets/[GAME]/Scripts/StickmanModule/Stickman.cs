@@ -5,6 +5,7 @@ using _GAME_.Scripts.BrickModule;
 using _GAME_.Scripts.BridgeModule;
 using _GAME_.Scripts.ComponentAccess;
 using Sirenix.OdinInspector;
+using Sirenix.OdinInspector.Editor.StateUpdaters;
 using Template;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -33,6 +34,7 @@ namespace _GAME_.Scripts.StickmanModule
         private Action<StickmanState> _onStateChanged;
         private Action _currentOnDroppedAll;
         private Action _currentOnSomeRemaining;
+        private bool _isUpdateActive;
 
         public void Init()
         {
@@ -47,9 +49,14 @@ namespace _GAME_.Scripts.StickmanModule
             
             SetStickmanState(StickmanState.CarryIdle); 
             ObstacleMode();
+            
+            
         }
         private void Update()
         {
+            if(_isUpdateActive == false)
+                return;
+            
             moverPoint.OnUpdate();
             moverPath.OnUpdate();
         }
@@ -63,11 +70,16 @@ namespace _GAME_.Scripts.StickmanModule
 
         public void CrossTheBridge(Bridge bridge, Action onCrossDone)
         {
+            EnableUpdate();
             moverPoint.Move(bridge.pathPoints[0]);
             moverPoint.onDestinationReachedOnce = () =>
             {
                 moverPath.Move(bridge.pathPoints.GetRange(1, bridge.pathPoints.Count-1));
-                moverPath.onDestinationReachedOnce = onCrossDone;
+                moverPath.onDestinationReachedOnce = () =>
+                {
+                    DisableUpdate();
+                    onCrossDone?.Invoke();
+                };
             };
         }
         public void SetStickmanState(StickmanState state)
@@ -128,6 +140,14 @@ namespace _GAME_.Scripts.StickmanModule
                 StickmanSettings.Instance.rotationToBackSettings,
                 onDone);
         }
+        public void DisableUpdate()
+        {
+            _isUpdateActive = false;
+        }
+        public void EnableUpdate()
+        {
+            _isUpdateActive = true;
+        }
         
         
 
@@ -155,10 +175,13 @@ namespace _GAME_.Scripts.StickmanModule
                     ComponentFinder.instance.StageHandler.CurrentStage.stickmanGrid
                         .ClearSlotWith(this);
                     
+                    EnableUpdate();                    
                     moverPoint.Move(slotFound.objectHolder.position);
 
                     moverPoint.onDestinationReachedOnce = () =>
                     {
+                        DisableUpdate();
+                        
                         SetStickmanState(StickmanState.CarryIdle);
 
                         RotateToFront(HandleReachedSlot);
@@ -229,9 +252,11 @@ namespace _GAME_.Scripts.StickmanModule
             List<Vector3> exitPoints = new();
             exitPoints.Add(Transform.position + (Vector3.back * .7f));
             exitPoints.Add(ComponentFinder.instance.StageHandler.CurrentStage.points.pointExit.position);
+            EnableUpdate();
             moverPath.Move(exitPoints);
             moverPath.onDestinationReachedOnce = () =>
             {
+                DisableUpdate();
                 Destroy(gameObject, .2f);
             };
         }

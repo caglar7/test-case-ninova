@@ -5158,8 +5158,8 @@ MonoBehaviour:
   prefabGridSlot: {fileID: 684659216127768570, guid: a5e06ea4a14798649987bcd60776dbd0, type: 3}
   slotHolder: {fileID: 622068799649623096}
   objectHolder: {fileID: 622068801418920479}
-  rowCount: 5
-  columnCount: 5
+  rowCount: 4
+  columnCount: 4
   slotScale: 1
   unitDistanceX: 0.3
   unitDistanceY: 0.3
@@ -9032,8 +9032,8 @@ MonoBehaviour:
   prefabGridSlot: {fileID: 684659216127768570, guid: a5e06ea4a14798649987bcd60776dbd0, type: 3}
   slotHolder: {fileID: 622068799753905777}
   objectHolder: {fileID: 622068800181260099}
-  rowCount: 5
-  columnCount: 5
+  rowCount: 4
+  columnCount: 4
   slotScale: 1
   unitDistanceX: 0.3
   unitDistanceY: 0.3
@@ -9277,7 +9277,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.05, y: 0.5, z: 0.805}
+  m_Extents: {x: 0.05, y: 0.5, z: 1}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -10923,7 +10923,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.05, y: 0.5, z: 0.805}
+  m_Extents: {x: 0.05, y: 0.5, z: 1}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -11270,7 +11270,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 622068801410013560}
   m_LocalRotation: {x: -0, y: 0.70710576, z: -0, w: 0.70710784}
-  m_LocalPosition: {x: 0, y: 0, z: -0.875}
+  m_LocalPosition: {x: 0, y: 0, z: -0.916}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -67,6 +67,8 @@ namespace _GAME_.Scripts.StageModule
         
         private void MoveToNextStage(Stage stage)
         {
+            StageEvents.StageTransitionStarted?.Invoke();
+            
             if (stage.isFinalStage)
             {
                 FinishLevel();
@@ -92,9 +94,9 @@ namespace _GAME_.Scripts.StageModule
                     _targetStickmanCount++;
                 }
             }
-            for (int col = 0; col < 5; col++)
+            for (int col = 0; col < CurrentStage.stickmanGrid.columnCount; col++)
             {
-                for (int row = 0; row < 5; row++)
+                for (int row = 0; row < CurrentStage.stickmanGrid.rowCount; row++)
                 {
                     if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
                         CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
@@ -124,9 +126,9 @@ namespace _GAME_.Scripts.StageModule
         }
         private void MoveStickmansFromGrid()
         {
-            for (int col = 0; col < 5; col++)
+            for (int col = 0; col < CurrentStage.stickmanGrid.columnCount; col++)
             {
-                for (int row = 0; row < 5; row++)
+                for (int row = 0; row < CurrentStage.stickmanGrid.rowCount; row++)
                 {
                     if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
                         CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
@@ -171,9 +173,9 @@ namespace _GAME_.Scripts.StageModule
                     }
                 }
             }
-            for (int col = 0; col < 5; col++)
+            for (int col = 0; col < CurrentStage.stickmanGrid.columnCount; col++)
             {
-                for (int row = 0; row < 5; row++)
+                for (int row = 0; row < CurrentStage.stickmanGrid.rowCount; row++)
                 {
                     if (CurrentStage.stickmanGrid.GetSlot(row, col).IsFilled() &&
                         CurrentStage.stickmanGrid.GetSlot(row, col).currentObject is Stickman stickman)
@@ -210,12 +212,15 @@ namespace _GAME_.Scripts.StageModule
             
                 stickman.CrossTheBridge(bridgeClosest, () =>
                 {
+                    stickman.EnableUpdate();
                     stickman.moverPoint.Move(
                         ComponentFinder.instance.FinishHandler.finishSlotHandler.slots[slotIndex].Transform.position
                     );
 
                     stickman.moverPoint.onDestinationReachedOnce = () =>
                     {
+                        stickman.DisableUpdate();
+                        
                         stickman.SetStickmanState(StickmanState.CarryIdle);
                     
                         onMoveDone?.Invoke();
@@ -241,10 +246,13 @@ namespace _GAME_.Scripts.StageModule
             
             stickman.CrossTheBridge(bridgeClosest, () =>
             {
+                stickman.EnableUpdate();
                 stickman.moverPoint.Move(NextStage.stickmanSlotHandler.slots[slotIndex].objectHolder.position);
                 
                 stickman.moverPoint.onDestinationReachedOnce = () =>
                 {
+                    stickman.DisableUpdate();
+                    
                     stickman.SetStickmanState(StickmanState.CarryIdle);
                     
                     CheckStickmanCount();
@@ -268,10 +276,13 @@ namespace _GAME_.Scripts.StageModule
             
                 stickman.CrossTheBridge(bridgeClosest, () =>
                 {
+                    stickman.EnableUpdate();
                     stickman.moverPoint.Move(NextStage.stickmanGrid.GetSlot(row, col).objectHolder.position);
 
                     stickman.moverPoint.onDestinationReachedOnce = () =>
                     {
+                        stickman.DisableUpdate();
+                        
                         stickman.SetStickmanState(StickmanState.CarryIdle);
                         
                         CheckStickmanCount();
@@ -310,7 +321,10 @@ namespace _GAME_.Scripts.StageModule
         }
         private void ActivateStageBorder()
         {
-            CurrentStage.borderBack.SetActive(true);            
+            GeneralUtils.Delay(1f, () =>
+            {
+                CurrentStage.borderBack.SetActive(true);            
+            });
         }
     }
 }

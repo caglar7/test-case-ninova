@@ -19,6 +19,8 @@ namespace _GAME_.Scripts.GameStateModule
             StickmanEvents.OnMadeMove += timerFail.StartTimer;
             
             StageEvents.OnAllStagesDone += CheckComplete;
+
+            StageEvents.StageTransitionStarted += HandleStageTransitionStarted;
         }
 
         public override void UnsubscribeToEvents()
@@ -28,6 +30,13 @@ namespace _GAME_.Scripts.GameStateModule
             StickmanEvents.OnMadeMove -= timerFail.StartTimer;
             
             StageEvents.OnAllStagesDone -= CheckComplete;
+            
+            StageEvents.StageTransitionStarted -= HandleStageTransitionStarted;
+        }
+
+        private void HandleStageTransitionStarted()
+        {
+            timerFail.PauseTimer();
         }
 
         public override bool IsCompleted()

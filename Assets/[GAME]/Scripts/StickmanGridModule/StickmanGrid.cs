@@ -21,8 +21,8 @@ namespace _GAME_.Scripts.StickmanGridModule
 
             for (int i = 0; i < SpawnDatas.Count; i++)
             {
-                row = i / 5;
-                column = i % 5;
+                row = i / rowCount;
+                column = i % columnCount;
                 
                 Stickman stickman = Instantiate(stickmanPrefab).GetComponent<Stickman>();
 
